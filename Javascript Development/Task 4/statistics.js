@@ -264,6 +264,8 @@ function chargeTablesMostLeast() {
 
 //FINAL FUNCIONES---------------------------------------------------------------------------------------------
 
+
+
 //datos del json del senate (el que tenga como data linkeado desde script)
 let dataTable = data.results[0].members;
 
