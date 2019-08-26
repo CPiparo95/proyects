@@ -1,0 +1,20 @@
+nav{
+    position: absolute;
+    left: 30%;
+    top: 25%;
+}
+
+.images img{
+    position: relative;
+    left: 05%;
+    top: -50px;
+    display: grid;
+    height: auto;
+    width: 20%;
+}
+
+header h1{
+    position: relative;
+    left: 35%;
+    top: 100px;
+}

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+	<title>NYSL Registration form</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+  <h1> Northside Youth Soccer League </h1>
+</header>
+
+<div class="images">
+	<img id = "imagen1" src="Images/design1_image1.jpg" alt="Soy una imagen" >
+	<img id = "logo" src="Images/nysl_logo.png" alt="Soy un logo" >
+	<img id = "imagen2" src="Images/design2_image1.jpg" alt="Soy una imagen 2" >
+</div>
+
+<u id = "lowTitle" > Registration Form </u>
+
+<nav>
+	<a href="index_nysl.html">Home</a>
+	<a href="about_nysl.html">About</a>
+	<a href="contact_nysl.html">Contact</a>
+	<a href="rules_nysl.html">Rules</a>
+	<a href="games_information_nysl.html">Information</a>
+	<a href="registration.html">registration</a>
+</nav>
+	
+<main id="reg_main_css">
+
+    <h1>Registration form</h1>
+
+    <form method="GET" action="show_data.html">
+        Player’s First Name:
+        <input type="text" name="firstName" id="first_name">
+	
+        Player’s Last Name:
+        <input type="text" name="lastName" id="last_name">
+	
+        Player’s Street Address:
+        <input type="text" name="streetAddress" id="street_address">
+	
+		<br>
+		<br>
+
+		<b>gender</b>
+		<input type="radio" name="gender" value="man" > man
+		<input type="radio" name="gender" value="women" > women
+		<input type="radio" name="gender" value="BiGender" > BiGender
+		<input type="radio" name="gender" value="Cross–Dresser" > Cross-Dresser
+		<input type="radio" name="gender" value="Drag-King" > Drag-King
+		<input type="radio" name="gender" value="Drag-Queen" > Drag-Queen
+		<input type="radio" name="gender" value="androgynous" > androgynus
+		<input type="radio" name="gender" value="Femme" > Femme
+		<input type="radio" name="gender" value="FTM" > FTM
+		<br>
+		<input type="radio" name="gender" value="Gender Bender" > GenderBender
+		<input type="radio" name="gender" value="Genderqueer" > Genderqueer
+		<input type="radio" name="gender" value="MTF" > MTF
+		<input type="radio" name="gender" value="No Op" > No Op
+		<input type="radio" name="gender" value="Hijra" > Hijra
+		<input type="radio" name="gender" value="Pangender" > Pangender
+		<input type="radio" name="gender" value="Transexual" > Transexual
+		<input type="radio" name="gender" value="Buch" > Buch
+		<input type="radio" name="gender" value="Two-Spirit" > Two-Spirit
+		<input type="radio" name="gender" value="Agender" > Agender
+		<br>
+		<input type="radio" name="gender" value="Third sex" > Third Sex
+		<input type="radio" name="gender" value="Gender fluid" > Gender fluid
+		<input type="radio" name="gender" value="Transgender non binary" > Transgender Non binary
+		<input type="radio" name="gender" value="Hermaphrodite" > Hermaphrodite
+		<input type="radio" name="gender" value="Gifted Gender" > Gifted Gender
+		<input type="radio" name="gender" value="Femme Queen" > Femme Queen
+		<input type="radio" name="gender" value="Transgender experience person" > Transgender experience person
+
+		<br>
+		<br>
+
+		<b>grade</b>
+		<input type="radio" name="grade" value="pre School" > pre-school
+		<input type="radio" name="grade" value="First grade" > 1st
+		<input type="radio" name="grade" value="Second grade" > 2nd
+		<input type="radio" name="grade" value="Third grade" > 3rd
+		<input type="radio" name="grade" value="four grade" > 4th
+		<input type="radio" name="grade" value="five grade" > 5th
+
+		<br>
+		<br>
+
+        City:
+        <input type="text" name="city" id="city">
+	
+        Zip Code:
+        <input type="text" name="zipCode" id="zip_code">
+	
+        Birth Date:
+		<input type="date" name="birthDate" id="birth_date">
+		
+		<br>
+	
+        Parent/Guardian:
+        <input type="text" name="parentGuardian" id="parent_guardian">
+	
+        Contact Phone:
+        <input type="number" name="contactPhone" id="contact_phone">
+	
+        Contact E-mail
+        <input type="text" name="e-mail" id="contact_email">
+	
+	<h4>Which elementary schools do you live near? </h4>
+
+	<b>First Closest School:</b>
+	<select name="FirstClosestSchool">
+		<option value="AJ Katzenmaier">AJ Katzenmaier</option>
+		<option value="Greenbay">Greenbay</option>
+		<option value="Howard A Yeager">Howard A Yeager</option>
+		<option value="Marjorie P Hart">Marjorie P Hart</option>
+		<option value="North Elementary">North Elementary</option>
+		<option value="South Elementary">South Elementary</option>
+	</select>
+
+	<br>
+
+	<b>Second Closest School: </b>
+	<select name="SecondClosestSchool">
+		<option value="AJ Katzenmaier" >AJ Katzenmaier</option>
+		<option value="Greenbay" >Greenbay</option>
+		<option value="Howard A Yeager" >Howard A Yeager</option>
+		<option value="Marjorie P Hart" >Marjorie P Hart</option>
+		<option value="North Elementary" >North Elementary</option>
+		<option value="South Elementary" >South Elementary</option>
+	</select>
+
+	<br>
+	<br>
+
+	<b>What position(s) do you normally play?</b>(check all that apply)
+	<br>
+	<label class="container">Forward
+		<input type="checkbox" value="Forward" name="positionPlayed">
+		<span class="checkmark"></span>
+	</label>
+			  
+	<label class="container">Defense
+		<input type="checkbox" value="Defense" name="positionPlayed">
+		<span class="checkmark"></span>
+	</label>
+			  
+	<label class="container">Midfield
+		<input type="checkbox" value="Midfield" name="positionPlayed">
+		<span class="checkmark"></span>
+	</label>
+			  
+	<label class="container">Goalkeeper
+		<input type="checkbox" value="Goalkeeper" name="positionPlayed">
+		<span class="checkmark"></span>
+	</label>
+
+	<br>
+	<br>
+
+	<b>What position(s) do you want to play?</b>(check all that apply)
+	<br>
+	<label class="container">Forward
+		<input type="checkbox" value="Forward" name="positionWanted">
+		<span class="checkmark"></span>
+	</label>
+				  
+	<label class="container">Defense
+		<input type="checkbox" value="Defense" name="positionWanted">
+		<span class="checkmark"></span>
+	</label>
+				  
+	<label class="container">Midfield
+		<input type="checkbox" value="Midfield" name="positionWanted">
+		<span class="checkmark"></span>
+	</label>
+				  
+	<label class="container">Goalkeeper
+		<input type="checkbox" value="Goalkeeper" name="positionWanted">
+		<span class="checkmark"></span>
+	</label>
+
+	<br>
+	<br>
+
+	<input type="radio" name="AlreadyHaveAUniform" value="yes"> <b>Have a Uniform</b> <br>
+
+	<b>Jersey Size:</b>
+	<br>
+	<select name="JerseySize">
+		<option value="Youth Small">Youth Small</option>
+		<option value="Youth Medium">Youth Medium</option>
+		<option value="Youth large">Youth large</option>
+		<option value="Small">Small</option>
+		<option value="Medium">Medium</option>
+		<option value="Large">Large</option>
+		<option value="Extra large">Extra Large</option>
+	</select>
+
+	<br>
+
+	<b>Shorts Size:</b>
+	<br>
+	<select name="ShortsSize">
+		<option value="Youth Small">Youth Small</option>
+		<option value="Youth Medium">Youth Medium</option>
+		<option value="Youth large">Youth large</option>
+		<option value="Small">Small</option>
+		<option value="Medium">Medium</option>
+		<option value="Large">Large</option>
+		<option value="Extra large">Extra Large</option>
+	</select>
+
+	<h3>Permission to Play</h3>
+
+	<p>I, the parent or guardian of the minor registrant, agree that the registrant and I will abide by all the rules of the Northside Youth
+	Soccer League (NYSL). <br>
+	In recognizing the possibility of physical injury associated with soccer and in consideration for the “League”
+	accepting the registrant for its soccer programs <br>
+	and activities, I hereby release, discharge, and/or otherwise indemnify NYSL, their
+	employees and associated personnel and volunteers, <br>
+	including the facilities used for practices and games, against any claim by or
+	on behalf of the registrant as a result of the registrant’s participation in the program <br>
+	and/or being transported to or from NYSL
+	sponsored activities, which transportation.
+	By entering your name below, I hereby agree and authorize the above. <br>
+	In addition, by entering your name below, I also acknowledge that I have read the
+	cancellation policy and agree to its terms. 
+	</p>
+
+	Parent/Guardian Signature: 
+	<input type="text" name="ParentGuardianSignature" id="signature">
+				
+	Date:
+	<input type="date" name="Fecha" id="date">
+	<input type="submit">
+	</form>
+
+</main>
+
+</body>
+</html>
