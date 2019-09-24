@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <title>Index</title>
+</head>
+
+<body>
+  <div id="app">
+    <template>
+      <menu_hamburguer></menu_hamburguer>
+      <home_page :nextgames="nextGames"></home_page>
+
+      <div v-for="juego in nextGames">
+        <next_game :nextgame="juego"> </next_game>
+      </div>
+    </template>
+    <button v-on:click="dbAsk()"> muestra los datos de DB </button>
+  </div>
+
+  <div id="scripts">
+    <!-- BOOTSTRAP scripts -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+    </script>
+
+    <!-- VUE.JS script -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
+
+    <!-- FireBase scripts -->
+    <script src="https://www.gstatic.com/firebasejs/5.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.10.1/firebase-database.js"></script>
+    <script src="js/firebaseConfig.js"></script>
+
+    <!-- main JS -->
+    <script src="js/main.js"></script>
+
+    <!-- main JS -->
+    <script src="js/menu_hamburguer.js"></script>
+  </div>
+
+</body>
+
+</html>

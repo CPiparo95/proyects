@@ -20,8 +20,7 @@ function filterTableChange(){
     boxes[2] = "";
   }
   chargeMyTable(data, boxes)
-}
-//FIN FUNCION
+}//FIN FUNCION
 
 //INICIO FUNCION para evitar datos repetidos 
 function notRepeated(array1) {
@@ -35,8 +34,7 @@ function notRepeated(array1) {
     }
   }
   return repeatNumbersArray;
-}
-//FIN FUNCION
+}//FIN FUNCION
 
 //INICIO FUNCION y codigo de llenado de dropdown
 function chargeMyDropdown(array) {
@@ -51,10 +49,9 @@ statesArray.push(person.state)     // aca se carga un array con todos los estado
 statesArray = notRepeated(statesArray);
 statesArray.sort();
   HTML +=`<option value="all">All</option>
-  ${statesArray.map(statesArray => `<option value="${statesArray}">${statesArray} </option>`).join("")}`
+  ${statesArray.map(statesArray => `<option value="${statesArray}">${statesArray} </option>`).join("")}`;
 document.getElementById('dropdownFilter').innerHTML = HTML;
-}
-//FIN FUNCION
+}//FIN FUNCION
 
 //INICIO FUNCION y codigo de llenado de tabla
 function chargeMyTable(array) {
@@ -106,9 +103,9 @@ function chargeMyTable(array) {
     });
     HTML += `</tbody>`;
     document.getElementById('people-data').innerHTML = HTML; //Aca inyecto el HTML en la tabla
-  }
-//FIN FUNCION del codigo de llenado de table
-//FINAL DE FUNCIONES--------------------------------------------------------------------------------------------
+}//FIN FUNCION del codigo de llenado de table
+
+  //FINAL DE FUNCIONES--------------------------------------------------------------------------------------------
 
 //MAIN CODE
 var boxes = ["D","R","I"];
@@ -127,5 +124,5 @@ chargeMyDropdown(data);
 chargeMyTable(data);
 
 document.getElementById("dropdownFilter").onchange = function(){
-  chargeMyTable(data)
+  chargeMyTable(data);
 }

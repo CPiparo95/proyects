@@ -1,0 +1,101 @@
+#openSwipe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 10vw;
+    height: 100%;
+    z-index: 25;
+}
+
+#closeSwipe {
+    float: right;
+    background: none;
+    border: none;
+}
+
+#closeSwipe i {
+    margin: 47vh 5.25vw;
+    opacity: 0;
+    font-size: 4vh;
+    background: var(--thirth);
+    border: none;
+    color: var(--background);
+    border-radius: 2.25vw;
+    padding: 0px 2vw;
+    box-shadow: 0.25vw 0vw 1vw var(--second);
+    transition: 0.25s all;
+}
+
+#menuSwipe {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    z-index: 50;
+    background: rgba(29, 29, 29, 0.75);
+    transition: 0.15s all;
+    opacity: 0;
+}
+
+#menuSwipeButtons {
+    width: 75vw;
+    height: 100%;
+    display: inline-block;
+    background: var(--background);
+}
+
+#menuSwipe #menuSwipeButtons #headerSwipe {
+    display: block;
+    padding: 1.5vh 2vw;
+}
+
+#menuSwipe #menuSwipeButtons #headerSwipe #photoSwipe {
+    height: 11vh;
+    border-radius: 50%;
+    border: 0.5vh solid var(--background);
+    box-shadow: 0.25vw 0.25vw 0.5vw var(--disabled);
+}
+
+#menuSwipe #menuSwipeButtons #headerSwipe #nameUserSwipe {
+    font-size: 2.5vh;
+    color: var(--thirth);
+    font-weight: 500;
+    display: block;
+}
+
+#menuSwipe #menuSwipeButtons .lineSwipe {
+    display: block;
+    height: 0.25vh;
+    border-bottom: 0.15vh solid var(--disabled);
+    width: 90%;
+    box-shadow: 0.25vw 0.25vw 0.5vw var(--disabled);
+    margin: 0.75vh auto;
+    opacity: 0.5;
+}
+
+#menuSwipe #menuSwipeButtons .btnSwipeMenu {
+    display: block;
+    width: 95%;
+    margin: 1vh auto;
+    text-align: left;
+    font-size: 2.25vh;
+    color: var(--text);
+    background: none;
+    border: none;
+    padding: 2vh 2vw;
+    transition: 0.25s all;
+    opacity: 0.90;
+    border-radius: 0 10vw 10vw 0;
+}
+
+#menuSwipe #menuSwipeButtons .btnSwipeMenu:active,
+#closeSwipe i:active {
+    background: linear-gradient(to right, var(--background), var(--thirth));
+    opacity: 0.5;
+}
+
+
+#menuSwipe #menuSwipeButtons .btnSwipeMenu i {
+    margin-right: 2.5vw;
+}

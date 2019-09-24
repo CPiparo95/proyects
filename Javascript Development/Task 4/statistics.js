@@ -1,278 +1,125 @@
-//FUNCIONES----------------------------------------------------------------------------------------------------
-
-//constante con los datos a procesar
-const statistics_data = {
-    //datos escenciales
-    democrats: 0,
-    republicans: 0,
-    independents: 0,
-    //datos para table glance
-    senate_glance: {
-        democrats_votes: 0,
-        republican_votes: 0,
-        independent_votes: 0
+var app = new Vue({
+    el: '#app',
+    data: {
+        members : [],
+        tenPercent : 0,
+        atGlance: {
+            num_dem: 0,
+            num_rep: 0,
+            num_inds: 0,
+            total: 0,
+            votes_dem_party: 0,
+            votes_rep_party: 0,
+            votes_inds_party: 0,
+            votes_dem_attendance: 0,
+            votes_rep_attendance: 0,
+            votes_inds_attendance: 0,
+        },
+        members_sort : [],
+        members_reverse_sort : []
     },
-    //datos para tabla most/least engaged
-    general_votes: [],
-    //datos para tabla least engaged
-    least_general_votes: [],
-    //datos para tabla most engaged 
-    most_general_votes: []
-}
+    created: () => {
+        let url = document.getElementById("senate")
+        ? "https://api.propublica.org/congress/v1/113/senate/members.json" 
+        : "https://api.propublica.org/congress/v1/113/house/members.json"
 
-//INICIO FUNCION procesa datos escenciales
-function processEscencialData(members) {
-    for (n = 0; n <= members.length - 1; n++) {
-        switch (members[n].party) {
-            case "D":
-                statistics_data.democrats++;
-                continue;
-            case "R":
-                statistics_data.republicans++;
-                continue;
-            case "I":
-                statistics_data.independents++;
-        }
-    }
-} //FIN FUNCION
+        let key = "hgAkxR7fIwUj9BOTbv51ZCyXGlVXvV134mqIrctH"
 
-//INICIO FUNCION devuelve el nombre de la tabla en uso
-function nombreTablaGlance() {
-
-    if (document.getElementById("glance-senate-loyalty")) {
-        table_name = "glance-senate-loyalty"
-    } else if (document.getElementById("glance-senate-attendance")) {
-        (table_name = "glance-senate-attendance")
-    } else {
-        alert("ERROR CRITICO, NO EXISTE TABLA GLANCE O ID INCORRECTO")
-    }
-    return table_name
-} //FIN FUNCION
-
-//INICIO FUNCION procesa datos para tablas GLANCE
-function processDataGlance(members) {
-    let democrats_votes = 0;
-    let independent_votes = 0;
-    let republican_votes = 0;
-
-    //LOYALTY
-    //suma de los porcentajes existentes
-    //luego dividirlos por cantidad de politicos segun partido
-    //ATTENDANCE
-    //por cada politico, suma cantidad de votos a partir de su periodo y resta votos perdidos,
-    //luego dividirlos por cantidad de politicos segun partido
-
-    if (nombreTablaGlance() == "glance-senate-loyalty") {
-        for (n = 0; n <= members.length - 1; n++) {
-            switch (members[n].party) {
-                case "D":
-                    democrats_votes += members[n].votes_with_party_pct;
-                    continue;
-                case "R":
-                    republican_votes += members[n].votes_with_party_pct;
-                    continue;
-                case "I":
-                    independent_votes += members[n].votes_with_party_pct;
-                    continue;
+        fetch(url,{
+            method: 'GET',
+            headers: {
+                'X-API-Key': key
             }
-        }
-    } else {
-        // ahora estamos en attendance
-        for (n = 0; n <= members.length - 1; n++) {
-            switch (members[n].party) {
-                case "D":
-                    democrats_votes += 
-                    (((members[n].total_votes - members[n].missed_votes) / members[n].total_votes) * 100);
-                    continue;
-                case "R":
-                    republican_votes += 
-                    (((members[n].total_votes - members[n].missed_votes) / members[n].total_votes) * 100);
-                    continue;
-                case "I":
-                    independent_votes +=
-                    (((members[n].total_votes - members[n].missed_votes) / members[n].total_votes) * 100);
-                    continue;
+        }).then(function(response){
+            if(response.ok){
+                return response.json()
+            }else{
+                throw new Error()
             }
-        }
-    }
-    statistics_data.senate_glance.democrats_votes = democrats_votes / statistics_data.democrats;
-    statistics_data.senate_glance.republican_votes = republican_votes / statistics_data.republicans;
-    statistics_data.senate_glance.independent_votes = independent_votes / statistics_data.independents;
-} //FIN FUNCION
-
-//INICIO FUNCION carga de datos a tabla GLANCE
-function chargeTableGlance() {
-
-    let HTML = `<thead>
-    <td>PARTY</td>
-    <td>Number of representatives</td>
-    <td> % voted with party</td>
-    </thead>
-    <tbody>
-    <tr>
-    <td>Republican</td>
-    <td>${statistics_data.republicans}</td>
-    <td>${redondeo(statistics_data.senate_glance.republican_votes)}</td>
-    </tr>
-    <tr>
-    <td>Democrat</td>
-    <td>${statistics_data.democrats}</td>
-    <td>${redondeo(statistics_data.senate_glance.democrats_votes)}</td>
-    </tr>
-    <tr>
-    <td>Independent</td>
-    <td>${statistics_data.independents || "N/H"}</td>
-    <td>${redondeo(statistics_data.senate_glance.independent_votes) || "N/H"}</td>
-    </tr>
-    </tbody>`;
-    document.getElementById(nombreTablaGlance()).innerHTML = HTML;
-
-} //FIN FUNCION
-
-//INICIO FUNCION para redondear
-function redondeo(numero) {
-    return Math.round(numero);
-} //FIN FUNCION
-
-//INICIO FUNCION procesa datos para tablas most/less
-function processMostLessEngaged(members) {
-    let total_votes = 0;
-    let real_votes = 0;
-    let oneMember = {
-        name: "",
-        link: "",
-        partial_votes: 0,
-        votes: 0
-    };
-    let tenPercent = ((members.length * 10) / 100);
-    tenPercent = redondeo(tenPercent);
-
-    if (!nombreTablaGlance() == "glance-senate-loyalty") {
-        for (n = 0; n <= members.length - 1; n++) {
-            //ATTENDANCE CASE
-            total_votes = members[n].total_votes;
-            real_votes = total_votes - members[n].missed_votes;
-            oneMember.votes = ((real_votes / total_votes) * 100);
-            //both cases
-            oneMember.name =
-                (members[n].first_name + " " + (members[n].middle_name || "") + " " + members[n].last_name);
-            oneMember.link = members[n].url;
-            oneMember.partial_votes = members[n].missed_votes;
-            statistics_data.general_votes.push({
-                name: oneMember.name,
-                votes: oneMember.votes,
-                link: oneMember.link,
-                partial_votes: oneMember.partial_votes
+        }).then(function(json){
+            app.members = json.results[0].members
+            app.calculate()
+        }).catch(function(error){
+            console.log(error)
+        })     
+},
+    methods:{
+        redondeo(numero) {
+            return Math.round(numero);
+        },
+        calculate(){
+            this.members.forEach(e => {
+                //llenado de members con los datos a utilizar en la tabla
+                this.name =
+                (e.first_name + " " + (e.middle_name || "") + " " + e.last_name);
+                this.url = e.url;
+                this.missed_votes = e.missed_votes;
+                this.party_votes_percent = e.votes_with_party_pct;
+                this.num_party_votes = (((e.total_votes - e.missed_votes) * e.votes_with_party_pct) / 100);
+                this.percent_missed_votes = ((e.missed_votes * 100) / e.total_votes);
+                this.members_sort.push({
+                    name: this.name,
+                    party_votes_percent: this.redondeo(this.party_votes_percent),
+                    url: this.url,
+                    num_party_votes: this.redondeo(this.num_party_votes),
+                    missed_votes : this.missed_votes,
+                    percent_missed_votes : this.redondeo(this.percent_missed_votes)
+                });
+                //llenado de datos para glance
+                switch(e.party){
+                    case "D":
+                        this.atGlance.num_dem ++;
+                        this.atGlance.votes_dem_party += e.votes_with_party_pct;
+                        this.atGlance.votes_dem_attendance += (e.total_votes - e.missed_votes);
+                        break
+                    case "R": 
+                        this.atGlance.num_rep ++;
+                        this.atGlance.votes_rep_party += e.votes_with_party_pct;
+                        this.atGlance.votes_rep_attendance += (e.total_votes - e.missed_votes);
+                        break
+                    case "I": 
+                        this.atGlance.num_inds ++;
+                        this.atGlance.votes_inds_party += e.votes_with_party_pct;
+                        this.atGlance.votes_inds_attendance += (e.total_votes - e.missed_votes);
+                        break
+                }
             });
-        }
-    } else {
-        //LOYALTY CASE
-        for (n = 0; n <= members.length - 1; n++) {
-            total_votes = (members[n].votes_with_party_pct + members[n].missed_votes_pct);
-            real_votes = members[n].votes_with_party_pct;
-            oneMember.votes = members[n].votes_with_party_pct;
-            //both cases
-            oneMember.name =
-                (members[n].first_name + " " + (members[n].middle_name || "") + " " + members[n].last_name);
-            oneMember.link = members[n].url;
-            oneMember.partial_votes = members[n].total_votes * (members[n].votes_with_party_pct * 0.01);
-            statistics_data.general_votes.push({
-                name: oneMember.name,
-                votes: oneMember.votes,
-                link: oneMember.link,
-                partial_votes: oneMember.partial_votes
-            });
-        }
-    }
-    //sort de general votes
-    statistics_data.general_votes.sort(function (a, b) {
-        if (a.votes > b.votes) {
-            return 1;
-        }
-        if (a.votes < b.votes) {
-            return -1;
-        }
-        // a must be equal to b
-        return 0;
-    });
+            this.tenPercent = this.redondeo((this.members.length * 10) / 100);
+            this.atGlance.votes_dem_party = this.atGlance.votes_dem_party / this.atGlance.num_dem;
+            this.atGlance.votes_dem_attendance = this.atGlance.votes_dem_attendance / this.atGlance.num_dem;
+            this.atGlance.votes_rep_party = this.atGlance.votes_rep_party / this.atGlance.num_rep;
+            this.atGlance.votes_rep_attendance = this.atGlance.votes_rep_attendance / this.atGlance.num_rep;
+            this.atGlance.votes_inds_party = this.atGlance.votes_inds_party / this.atGlance.num_inds;
+            this.atGlance.votes_inds_attendance = this.atGlance.votes_inds_attendance / this.atGlance.num_inds;
+            this.atGlance.total = this.members.length;
 
-    //LEAST CASE
-    for (n = 0; n <= tenPercent - 1; n++) {
-        statistics_data.least_general_votes.push(statistics_data.general_votes[n]);
-    }
-    for (n = tenPercent; n <= members.length - 1; n++) {
-        if (statistics_data.least_general_votes[n - 1] == statistics_data.general_votes[n]) {
-            statistics_data.least_general_votes.push(statistics_data.general_votes[n + 1]);
-        } else {
-            break;
+            if(document.getElementById("loyalty")){
+                this.members_sort.sort(function (a, b) {
+                    if (a.party_votes_percent < b.party_votes_percent) {
+                        return 1;
+                    }
+                    if (a.party_votes_percent > b.party_votes_percent) {
+                        return -1;
+                    }
+                    // a must be equal to b
+                    return 0;
+                });
+            }else{
+                this.members_sort.sort(function (a, b) {
+                    if (a.percent_missed_votes < b.percent_missed_votes) {
+                        return 1;
+                    }
+                    if (a.percent_missed_votes > b.percent_missed_votes) {
+                        return -1;
+                    }
+                    // a must be equal to b
+                    return 0;
+                });
+            }
+            this.members_reverse_sort = this.members_sort.slice();
+            this.members_reverse_sort.reverse();
+            this.members_sort = this.members_sort.splice(0,this.tenPercent);
+            this.members_reverse_sort = this.members_reverse_sort.splice(0,this.tenPercent);
         }
     }
-    //MOST CASE
-    for (n = members.length - 1; n >= (members.length - (tenPercent + 1)); n--) {
-        statistics_data.most_general_votes.push(statistics_data.general_votes[n]);
-    }
-    for (n = (members.length - (tenPercent + 1)); n >= 0; n--) {
-        if (statistics_data.most_general_votes[statistics_data.most_general_votes.length - 1] == statistics_data.general_votes[n - 1]) {
-            statistics_data.most_general_votes.push(statistics_data.general_votes[n - 1]);
-        } else {
-            break;
-        }
-    }
-} //FIN FUNCION
-
-//INICIO FUNCION carga los datos a tablas most/least
-function chargeTablesMostLeast() {
-    let HTML = `<thead>
-    <td>Name</td>`;
-    if ((!nombreTablaGlance() == "glance-senate-loyalty")) {
-        HTML += `<td>Number of Missed Votes</td>
-    <td> % votes </td>
-    </thead>
-    <tbody>`;
-    } else {
-        HTML += `<td>Number of Party Votes</td>
-        <td> % party votes </td>
-        </thead>
-        <tbody>`;
-    }
-    let HTMLmost = HTML;
-    //CHARGE LEAST TABLE
-    for (n = 0; n <= statistics_data.least_general_votes.length - 1; n++) {
-        HTML += `<tr>
-        <td><a href='${statistics_data.least_general_votes[n].link}'>
-        ${statistics_data.least_general_votes[n].name}</a>
-        </td>
-        <td>${redondeo(statistics_data.least_general_votes[n].partial_votes)}</td>
-        <td>${statistics_data.least_general_votes[n].votes}</td>
-        </tr>
-        </tbody>`;
-    }
-    document.getElementById("least").innerHTML = HTML;
-    //CHARGE MOST TABLE
-    for (n = 0; n <= statistics_data.most_general_votes.length - 1; n++) {
-        HTMLmost += `<tr>
-            <td><a href='${statistics_data.most_general_votes[n].link}'>
-            ${statistics_data.most_general_votes[n].name}</a>
-            </td>
-            <td>${redondeo(statistics_data.most_general_votes[n].partial_votes)}</td>
-            <td>${statistics_data.most_general_votes[n].votes}</td>
-            </tr>
-            </tbody>`;
-    }
-    document.getElementById("most").innerHTML = HTMLmost;
-} //FIN FUNCION
-
-//FINAL FUNCIONES---------------------------------------------------------------------------------------------
-
-
-
-//datos del json del senate (el que tenga como data linkeado desde script)
-let dataTable = data.results[0].members;
-
-processEscencialData(dataTable);
-processDataGlance(dataTable);
-chargeTableGlance();
-processMostLessEngaged(dataTable);
-chargeTablesMostLeast();
-
-//chargeTable(dataTable);
+});

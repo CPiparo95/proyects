@@ -11,6 +11,7 @@
 </head>
 
 <body>
+    <div id="table">
     <div id="header" class="container">
         <div class="row">
 
@@ -31,32 +32,47 @@
     <!-- this is the navigation bar with bootstrap
 please don't touch it -->
 
-    <div class="navDiv">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand"
-                href="home-page.html">Home</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
-                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">
-                            Congress 113
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                            <a class="dropdown-item"
-                                href="house-data.html">House</a>
-                            <a class="dropdown-item"
-                                href="senate-data.html">Senate</a>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-    </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="home-page.html">Home</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+            aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        Congress 113
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="house-data.html">House</a>
+                        <a class="dropdown-item" href="senate-data.html">Senate</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        Attendance
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="senate-attendance.html">Senate</a>
+                        <a class="dropdown-item" href="house-attendance.html">house</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        Party Loyalty
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="senate-loyalty.html">Senate</a>
+                        <a class="dropdown-item" href="house-loyalty.html">House</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
     <div class="accordion" id="accordionExample">
         <div class="card">
@@ -87,32 +103,56 @@ please don't touch it -->
         </div>
     </div>
 
-    <!-- this is the table filled with data from pro-congress-113-house with bootstrap
-    please don't touch it -->
-
+    <!-- this is the table filled with data from pro-congress-113-senate with bootstrap
+    please don't touch it, the first items are checkboxes for the table -->
     <div class="d-flex justify-content-start">
         <div class="p-2 bd-highlight">
-            <input type="checkbox" class="form-check-input" id="democratCheck" checked>
+            <input v-model="parties" name="party" value="D" type="checkbox" class="form-check-input" id="democratCheck" >
             <label class="form-check-label" for="democratCheck">Democrat</label>
         </div>
         <div class="p-2 bd-highlight"></div>
         <div class="p-2 bd-highlight">
-            <input type="checkbox" class="form-check-input" id="republicanCheck" checked>
+            <input v-model="parties" name="party" value="R" type="checkbox" class="form-check-input" id="republicanCheck">
             <label class="form-check-label" for="republicanCheck">Republican</label>
         </div>
         <div class="p-2 bd-highlight"></div>
         <div class="p-2 bd-highlight">
-            <input type="checkbox" class="form-check-input" id="independentCheck" checked>
+            <input v-model="parties" name="party" value="I" type="checkbox" class="form-check-input" id="independentCheck">
             <label class="form-check-label" for="independentCheck">Independent</label>
-        </div>
+    </div>
+
         <!-- Dropdown  -->
         <div class="form-group">
-            <select class="form-control" id="dropdownFilter">
+            <select class="form-control" v-model="states" id="states" >
+                <option value="all">All</option>
+                <option v-for="state in statesArray" :value="state">{{state}}</option>
             </select>
         </div>
     </div>
-    <div class="table-fixed">
+    <br>
+    <div class="table-fixed" >
         <table id="people-data" class="table table-bordered table-striped mb-0 scroll-table">
+            <thead>
+                <td>FULL NAME</td>
+                <td>party</td>
+                <td>state</td>
+                <td>seniority</td>
+                <td>percent of the votes</td>
+            </thead>
+            <tbody>
+                <tr v-for="politicoCorrupto in filterMembers">
+                    <th>
+                        <a href= "{{politicoCorrupto.url}}">
+                            {{politicoCorrupto.first_name}}
+                            {{politicoCorrupto.middle_name || ""}}
+                            {{politicoCorrupto.last_name}}</a></th>
+
+                    <td>{{fullParty(politicoCorrupto.party)}}</td>
+                    <td>{{politicoCorrupto.state}}</td>
+                    <td>{{politicoCorrupto.seniority}}</td>
+                    <td>{{politicoCorrupto.votes_with_party_pct}}%</td>
+                </tr>
+            </tbody>
         </table>
     </div>
 
@@ -120,9 +160,7 @@ please don't touch it -->
         <p id="rightsReservedText">2016 TGIF | All Rights Reserved<span class="border border-dark"></span></p>
     </div>
 
-
-    <script src="pro-congress-113-house.js"> </script>
-    <script src="main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
     </script>
@@ -132,8 +170,8 @@ please don't touch it -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
     </script>
-
-
+    <script src="main.js"></script>
+    </div>
 </body>
 
 </html>

@@ -11,6 +11,8 @@
 </head>
 
 <body>
+    <div id="house"></div>
+    <div id="app">
     <div id="header" class="container">
         <div class="row">
 
@@ -101,48 +103,96 @@ please don't touch it -->
             </div>
         </div>
     </div>
-<div class="container">
-        <div class="row">
-            <div class="col">
-                <div class="table-fixed">
-                    <b>
-                        <h1>Senate at a Glance</h1>
-                    </b>
-                    <table id="glance-senate-loyalty" class="table table-bordered table-striped mb-0 scroll-table">
-                    </table>
+    <div class="container" id="loyalty">
+            <div class="row">
+                <div class="col">
+                    <div class="table-fixed" id="glance">
+                        <b>
+                            <h1>Senate at a Glance</h1>
+                        </b>
+                        <table class="table table-bordered table-striped mb-0 scroll-table">
+                            <thead>
+                                <td>PARTY</td>
+                                <td>Number of representatives</td>
+                                <td> % voted with party</td>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Republican</td>
+                                    <td>{{atGlance.num_rep}}</td>
+                                    <td>{{redondeo(atGlance.votes_rep_party)}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Democrat</td>
+                                    <td>{{atGlance.num_dem}}</td>
+                                    <td>{{redondeo(atGlance.votes_dem_party)}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Independent</td>
+                                    <td>{{atGlance.num_inds}}</td>
+                                    <td>{{redondeo(atGlance.votes_inds_party)}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="table-fixed">
+                        <b>
+                            <h1>Most loyalty</h1>
+                        </b>
+                        <table id="most" class="table table-bordered table-striped mb-0 scroll-table">
+                            <thead>
+                                <td>Name</td>
+                                <td>Number of party votes</td>
+                                <td> % party votes</td>
+                            </thead>
+                            <tbody>
+                                <tr v-for="politicoCorrupto in members_sort">
+                                    <th>
+                                        <a href="{{politicoCorrupto.url}}">
+                                            {{politicoCorrupto.name}}</a>
+                                        </th>
+                                    <td>{{politicoCorrupto.num_party_votes}}</td>
+                                    <td>{{politicoCorrupto.party_votes_percent}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-            <div class="col">
-                <div class="table-fixed">
-                    <b>
-                        <h1>Most loyalty</h1>
-                    </b>
-                    <table id="most" class="table table-bordered table-striped mb-0 scroll-table">
-                    </table>
+            <div class="row">
+                <div class="col">
+                    <div class="table-fixed">
+                        <b>
+                            <h1>Least Loyalty</h1>
+                        </b>
+                        <table id="least" class="table table-bordered table-striped mb-0 scroll-table">
+                            <thead>
+                                <td>Name</td>
+                                <td>Number of party votes</td>
+                                <td> % party votes</td>
+                            </thead>
+                            <tbody>
+                                <tr v-for="politicoCorruptoDadoVuelta in members_reverse_sort">
+                                    <th>
+                                        <a href="{{politicoCorruptoDadoVuelta.url}}">
+                                            {{politicoCorruptoDadoVuelta.name}}</a>
+                                        </th>
+                                    <td>{{politicoCorruptoDadoVuelta.num_party_votes}}</td>
+                                    <td>{{politicoCorruptoDadoVuelta.party_votes_percent}}</td>
+                                </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col">
-                <div class="table-fixed">
-                    <b>
-                        <h1>Least Loyalty</h1>
-                    </b>
-                    <table id="least" class="table table-bordered table-striped mb-0 scroll-table">
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <div id="rightsReserved">
         <p id="rightsReservedText">2016 TGIF | All Rights Reserved<span class="border border-dark"></span></p>
     </div>
 
-
-    <!-- <script src="pro-congress-113-house.js"> </script> -->
-    <script src="main.js"></script>
-    <script src="statistics.js"></script>
+    
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
     </script>
@@ -153,7 +203,8 @@ please don't touch it -->
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
     </script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
-
+    <script src="statistics.js"></script>
+</div>
 </body>
 
 </html>

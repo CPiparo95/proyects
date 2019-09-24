@@ -38,7 +38,7 @@ function repeatedNumbers(array1) {
 function concat(array1) {
     var texto = "";
     for (var n = 0; n < array1.length; n++) {
-        texto = texto + array1[n];
+        texto = texto + ", " + array1[n];
     }
     return texto;
 }
@@ -46,12 +46,11 @@ function concat(array1) {
 function reverse(item) {
     var texto = "";
     item = item.toString();
-    for (n = item.length; n > -1; n--) {
+    for (n = item.length; n >= 0; n--) {
         texto = texto + item.slice(n, n + 1);
     }
     return texto;
 }
-
 
 function alphabetOrder(texto) {
     var variable = texto.split('');
@@ -68,7 +67,7 @@ function parserStrArrAndShowLongestWord(str) {
     var longestWord = -5;
     var wordIndex = 0;
     for (n = 0; n < array.length; n++) {
-        if (longestWord < array[n].length){
+        if (longestWord < array[n].length) {
             longestWord = array[n].length;
             wordIndex = n;
         }
