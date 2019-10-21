@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css?family=Lora&display=swap" rel="stylesheet">
   <title>Index</title>
 </head>
 
@@ -15,13 +16,12 @@
   <div id="app">
     <template>
       <menu_hamburguer></menu_hamburguer>
-      <home_page :nextgames="nextGames"></home_page>
+      <home_page></home_page>
 
-      <div v-for="juego in nextGames">
-        <next_game :nextgame="juego"> </next_game>
-      </div>
+        <div v-for="juego in nextGames">
+          <next_game :nextgame="juego"> </next_game>
+        </div>
     </template>
-    <button v-on:click="dbAsk()"> muestra los datos de DB </button>
   </div>
 
   <div id="scripts">
