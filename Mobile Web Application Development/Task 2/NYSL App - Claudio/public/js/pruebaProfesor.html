@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>My SPA</title>
+        <style type="text/css">
+        	nav{
+        		border: 2px solid black
+        	}
+​
+        	ul{
+        		list-style-type: none;
+        		margin: 0;
+        		padding: 0;
+        	}
+​
+        	nav ul{
+        		display: flex;
+        		justify-content: space-around;
+        		align-items: center;
+        	}
+        	.card{
+        		background:blue;padding:5px;
+        		text-align:center;
+        		margin: 5px 0;
+        		font-weight:bold;
+        		color: white;
+        	}
+​
+        	#schedule ul li{
+        		border-bottom: 2px solid gray;
+        		text-align: center;
+        		font-size: 1.5em;
+        		padding: 2px;
+        		display: flex;
+        		justify-content: space-around;
+        	}
+​
+        	#pic{
+        		border-radius: 50%;
+        		width: 2.3em;
+        	}
+​
+        	.btn{
+        		border-radius: 50%;
+        		background: lightblue;
+        		color: white;
+        		font-size: 1.5em;
+        	}
+​
+        	.commentBubble{
+        		background: green;
+        		margin: 4px 1px;
+        		border-radius: 10px;
+        		color: white;
+        		padding: 3px;
+        		font-weight: bold;
+        	}
+        </style>
+    </head>
+<body>
+    <div id="app">
+        <header>
+            <h1>My SPA</h1>
+        </header>
+        <main>
+            <template v-if="user == 'guest'">
+                <h2>Welcome</h2>
+                <p>Please Login!</p>
+                <button @click="login()">Login with Google</button>
+            </template>
+            <template v-else>
+                <nav>
+                    <ul>
+                        <li><a @click="view = 'home'">Home</a></li>
+                        <li><a @click="view = 'schedule'">Schedule</a></li>
+                        <li><a @click="view = 'contact'">Contact</a></li>
+                        <li><img id="pic" :src="user.photoURL" alt="profile_photo"></li>
+                        <li><button @click="logout()">Logout</button></li>
+                    </ul>
+                </nav>
+                <component :is="view" :user="user"></component>
+            </template>
+            
+​
+        </main>
+    </div>
+    
+​
+    
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/6.6.1/firebase-app.js"></script>
+​
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+         https://firebase.google.com/docs/web/setup#config-web-app -->
+​
+    <script>
+      // Your web app's Firebase configuration
+      var firebaseConfig = {
+        apiKey: "AIzaSyAHxV8seBZ-28a37vSthMDatvvJD46-Ym8",
+        authDomain: "my-spa-9d6f0.firebaseapp.com",
+        databaseURL: "https://my-spa-9d6f0.firebaseio.com",
+        projectId: "my-spa-9d6f0",
+        storageBucket: "",
+        messagingSenderId: "1080955231474",
+        appId: "1:1080955231474:web:0ddacb0fdaffe62af5846b"
+      };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+    </script>
+    <!-- Add Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/5.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.10.1/firebase-database.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        const templates = {
+            home: `<div id="home">
+                        <h2>Welcome {{user.displayName}}</h2>
+                        <h3>Upcoming Matches</h3>
+                        <div class="card" v-for='match in nextMatches(date.getMonth() + 1, date.getDate())'>
+                            <p>{{match.date}}</p>
+                            <p>{{match.team1}} vs {{match.team2}}</p>
+                            <p>at {{match.time}}</p>
+                        </div>
+                    </div>`,
+            schedule: `<div id="schedule">
+            			<template v-if="showInfo">
+            				<button @click="showInfo = false">Back</button>
+            				<match-info :match="match" :user="user"></match-info>
+            			</template>
+            			<template v-else>
+            				<ul>
+	            				<li v-for="match in matches">
+	            					<span>{{match.date}}</span> <span>{{match.team1}} vs {{match.team2}}</span>
+	            					<button class="btn" @click="matchInfo(match)">+</button>
+	            				</li>
+	            			</ul>
+            			</template>
+            			
+                    </div>`,
+            contact: `<div id="contact">
+                        <h4>Hi! Please email us at:</h4>
+                        <p>or leave a comment</p>
+                        <textarea>
+                            
+                        </textarea>
+                        <button>Submit</button>
+                    </div>`,
+            matchInfo: `<div>
+	            			<div class="card">
+	            				<p>{{match.team1}} vs {{match.team2}}</p>
+	            				<p>{{match.date}} at {{match.time}}</p>
+	            				<p>{{match.location}}</p>	
+	            			</div>
+	            			<div class="forum">
+	            				<div v-for="(value,key) in comments" class="commentBubble">
+	            					<p>{{value.username}}:</p>
+	            					<p>{{value.post}}</p>
+	            				</div>
+	            				<div>
+	            					<input type="text" id="comment">
+	            					<button @click="comment(match.id)">Comment</button>
+	            				</div>
+	            			</div>
+
+            			</div>`
+        }
+
+        let app = new Vue({
+            el: '#app',
+            data: {
+                view : 'home',
+                schedule: {},
+                user: 'guest',
+            },
+            methods: {
+                login(){
+                    let provider = new firebase.auth.GoogleAuthProvider();
+                    firebase.auth().signInWithPopup(provider)
+                    .then(function(result){
+                        
+                        firebase.database().ref('schedule/').once('value')
+                        .then(function(snapshot){
+                            app.schedule = snapshot.val()
+                            app.user = result.user
+                        })
+                    })
+                    .catch(function(error){
+                        console.log(error)
+                    })
+                },
+                logout(){
+                    firebase.auth().signOut()
+                    .then(function(){
+                        app.user = 'guest'
+                        app.schedule = {}
+                    })
+                }
+            },
+            components: {
+                home: {
+                    props: ['user'],
+                    data: function(){
+                        return {
+                            date: new Date()
+                        }
+                    },
+                    methods: {
+                        nextMatches(month, day){
+                            let nextMatches = []
+
+                            for(let i = 0; i < 7; i++){
+                                let temp = 0
+
+                                if(day + i > 31){
+                                    day = 0
+                                    month++
+                                    temp = i - 1
+                                }
+
+                                if(app.schedule[month][day + i - temp]){
+                                    for(match in app.schedule[month][day + i]){
+                                        nextMatches.push(app.schedule[month][day + i][match])
+                                    }
+                                }
+
+
+                            }
+
+                            return nextMatches
+                        }
+                    },
+                    template: templates.home
+                },
+                schedule: {
+                    props: ['user'],
+                    data: function(){
+                    	return{
+                    		showInfo: false,
+                    		match: {}
+                    	}
+                    },
+                    methods:{
+                    	matchInfo(match){
+                    		this.showInfo = true
+                    		this.match = match
+                    	}
+                    },
+                    computed:{
+                        matches(){
+                            let matches = []
+
+                            for(month in app.schedule){
+                                for(date in app.schedule[month]){
+                                    for(match in app.schedule[month][date]){
+                                        matches.push(app.schedule[month][date][match])
+                                    }
+                                }
+                            }
+
+                            return matches
+                        }
+                    },
+                    template: templates.schedule,
+                    components: {
+                    	'match-info': {
+                    		props: ['user','match'],
+                    		data:function(){
+                    			return {
+                    				comments: {}
+                    			}
+                    		},
+                    		created(){
+                    			this.getComments(this.match.id)
+                    		},
+                    		methods: {
+                    			async getComments(matchId){
+                    				let comments
+                    				await firebase.database().ref(`forum/${matchId}`)
+                    				.once('value')
+                    				.then(function(snapshot){
+                    					comments = snapshot.val()
+                    				})
+
+                    				this.comments = comments
+                    			},
+                    			async comment(matchId){
+                    				let input = document.getElementById('comment')
+                    				let newKey = firebase.database().ref(`forum/${matchId}/`).push().key
+                    				let update = {}
+                    				update[`forum/${matchId}/${newKey}`] = {
+                    					uid: this.user.uid,
+                    					username: this.user.displayName,
+                    					email: this.user.email,
+                    					post: input.value,
+                    					match: this.match.id
+                    				}
+
+                    				await firebase.database().ref().update(update)
+
+                    				input.value = ""
+
+                    				this.getComments(this.match.id)
+                    			}
+                    		},
+                    		template: templates.matchInfo
+                    	}
+                    }
+                },
+                contact: {
+                    props: ['user'],
+                    template: templates.contact
+                }
+            }
+        })
+
+
+        
+    </script>
+</body>
+</html>
+
+
+
