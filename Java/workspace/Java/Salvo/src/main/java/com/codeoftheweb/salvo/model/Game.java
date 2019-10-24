@@ -29,7 +29,7 @@ public class Game {
 
     public Map<String, Object> GameDTO(){
         Map<String, Object> dto = new LinkedHashMap<>();
-        dto.put("id",this.id);
+        dto.put("game_id",this.id);
         dto.put("game_name", this.getGameName());
         dto.put("creation_date", this.getCreationDate());
         return dto;
@@ -37,17 +37,16 @@ public class Game {
 
     public Map<String, Object> GameWithPlayersDTO(){
         Map<String, Object> dto = new LinkedHashMap<>();
-        dto.put("id",this.id);
+        dto.put("game_id",this.id);
         dto.put("game_name", this.getGameName());
         dto.put("creation_date", this.getCreationDate());
-        dto.put("players", this.GetPlayer().stream().map(Player::PlayerDTO));
+        dto.put("gamePlayers", this.getGamePlayers().stream().map(GamePlayer::playerDTO));
         return dto;
     }
 
-    public Set<Player> GetPlayer(){
-        return this.gamePlayers.stream().map(GamePlayer::getPlayer).collect(Collectors.toSet());
+    public Set<GamePlayer> getGamePlayers() {
+        return gamePlayers;
     }
-
 
     public String getGameName() {
         return gameName;

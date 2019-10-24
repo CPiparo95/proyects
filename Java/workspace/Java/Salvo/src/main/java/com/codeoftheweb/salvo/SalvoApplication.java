@@ -40,10 +40,11 @@ public class SalvoApplication {
             Ship nave06 = shipRepository.save(new Ship(ShipType.HEAVY_CRUISER));
             Ship nave07 = shipRepository.save(new Ship(ShipType.AMPHIBIOUS_ASSAULT_SHIP));
             Ship nave08 = shipRepository.save(new Ship(ShipType.DESTROYER));
-            GamePlayer relacion1 = gamePlayerRepository.save (new GamePlayer(player1, juego01));
-            GamePlayer relacion2 = gamePlayerRepository.save(new GamePlayer(player2, juego01));
-            GamePlayer relacion3 = gamePlayerRepository.save (new GamePlayer(player3, juego02));
-            GamePlayer relacion4 = gamePlayerRepository.save(new GamePlayer(player4, juego02));
+            GamePlayer relacion1 = gamePlayerRepository.save(new GamePlayer(player1, juego01, LocalDateTime.now()));
+            GamePlayer relacion2 = gamePlayerRepository.save(new GamePlayer(player2, juego01, LocalDateTime.now()));
+            GamePlayer relacion5 = gamePlayerRepository.save(new GamePlayer(player1, juego02, LocalDateTime.now()));
+            GamePlayer relacion3 = gamePlayerRepository.save(new GamePlayer(player3, juego02, LocalDateTime.now()));
+            GamePlayer relacion4 = gamePlayerRepository.save(new GamePlayer(player4, juego02, LocalDateTime.now()));
             relacion1.addShip(nave01);
             relacion1.addShip(nave02);
             relacion2.addShip(nave03);
@@ -52,6 +53,12 @@ public class SalvoApplication {
             relacion3.addShip(nave06);
             relacion4.addShip(nave07);
             relacion4.addShip(nave08);
+
+            gamePlayerRepository.save(relacion1);
+            gamePlayerRepository.save(relacion2);
+            gamePlayerRepository.save(relacion3);
+            gamePlayerRepository.save(relacion4);
+            gamePlayerRepository.save(relacion5);
         };
     }
 }

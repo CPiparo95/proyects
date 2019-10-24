@@ -28,29 +28,29 @@ public class Player {
 
     public Map<String, Object> PlayerWithGamesDTO(){
         Map<String, Object> dto = new LinkedHashMap<>();
+        dto.put("player_id",this.id);
         dto.put("user_name", this.getUserName());
-        dto.put("games", this.getGames().stream().map(Game::GameDTO));
-        //dto.put("join_time", this.getJoinTime());
+        dto.put("game_player", this.getGamePlayers().stream().map(GamePlayer::gameDTO));
         return dto;
     }
 
     public Map<String, Object> PlayerDTO(){
         Map<String, Object> dto = new LinkedHashMap<>();
-        dto.put("id",this.id);
+        dto.put("player_id",this.id);
         dto.put("user_name", this.getUserName());
         return dto;
     }
 
-    public Set<Game> getGames(){
-        return this.gamePlayers.stream().map(GamePlayer::getGame).collect(Collectors.toSet());
-    }
-
-    //public Set<LocalDateTime> getJoinTime() {
-    //    return this.gamePlayers.stream().map(GamePlayer::getJoinTime).collect(Collectors.toSet());
-    //}
-
     public String getUserName() {
         return username;
+    }
+
+    public Set<GamePlayer> getGamePlayers() {
+        return gamePlayers;
+    }
+
+    public void setGamePlayers(Set<GamePlayer> gamePlayers) {
+        this.gamePlayers = gamePlayers;
     }
 
     public void setUserName(String userMail) {

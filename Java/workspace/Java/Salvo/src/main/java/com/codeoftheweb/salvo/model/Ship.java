@@ -2,6 +2,8 @@ package com.codeoftheweb.salvo.model;
 
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Entity
 public class Ship {
@@ -23,8 +25,22 @@ public class Ship {
         this.shipType = shiptype;
     }
 
+    public Map<String, Object> shipDTO(){
+        Map<String, Object> dto = new LinkedHashMap<>();
+        dto.put("id",this.id);
+        dto.put("ship_type", this.getShipType());
+        return dto;
+    }
+
     public ShipType getShipType() {
         return this.shipType;
     }
 
+    public GamePlayer getGamePlayer() {
+        return gamePlayer;
+    }
+
+    public void setGamePlayer(GamePlayer gamePlayer) {
+        this.gamePlayer = gamePlayer;
+    }
 }

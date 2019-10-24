@@ -5,7 +5,9 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.*;
 
 @Entity
 public class GamePlayer {
@@ -29,9 +31,26 @@ public class GamePlayer {
 
     public GamePlayer(){}
 
-    public GamePlayer(Player player, Game game){
+    public GamePlayer(Player player, Game game, LocalDateTime joinTime){
         this.player = player;
         this.game = game;
+        this.joinTime = joinTime;
+    }
+
+    public Map<String, Object> gameDTO(){
+        Map<String, Object> dto = new LinkedHashMap<>();
+        dto.put("game_player_id",this.id);
+        dto.put("join_time", this.getJoinTime());
+        dto.put("game", this.getGame().GameDTO());
+        return dto;
+    }
+
+    public Map<String, Object> playerDTO(){
+        Map<String, Object> dto = new LinkedHashMap<>();
+        dto.put("game_player_id",this.id);
+        dto.put("join_time", this.getJoinTime());
+        dto.put("player", this.getPlayer().PlayerDTO());
+        return dto;
     }
 
     public Game getGame(){
@@ -42,16 +61,13 @@ public class GamePlayer {
         return ship;
     }
 
-    public void setShip(Set<Ship> ship) {
-        this.ship = ship;
-    }
-
     public Player getPlayer(){
         return this.player;
     }
 
     public void addShip(Ship ship){
         this.ship.add(ship);
+        ship.setGamePlayer(this);
     }
 
     public LocalDateTime getJoinTime(){

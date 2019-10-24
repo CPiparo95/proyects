@@ -3,6 +3,8 @@ import com.codeoftheweb.salvo.model.*;
 import com.codeoftheweb.salvo.repositorys.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import sun.awt.X11.XErrorEvent;
+
 import java.util.*;
 import java.util.stream.*;
 
@@ -22,11 +24,6 @@ public class AppController {
     @Autowired
     private GamePlayerRepository gamePlayerRepo;
 
-   /* @RequestMapping("/ships")
-    public List<Map<String, Object>> getPlayers(){
-        return playerRepo.findAll().stream().map(Player::PlayerWithGamesDTO).collect(Collectors.toList());
-    } */
-
     @RequestMapping("/players")
     public List<Map<String, Object>> getPlayers(){
         return playerRepo.findAll().stream().map(Player::PlayerWithGamesDTO).collect(Collectors.toList());
@@ -35,6 +32,23 @@ public class AppController {
     @RequestMapping("/games")
     public List<Map<String, Object>> getGames(){
         return gameRepo.findAll().stream().map(Game::GameWithPlayersDTO).collect(Collectors.toList());
+    }
+
+    @RequestMapping("/game_view/{gamePlayerID}")
+    public Map<String, Object> getGameView(@PathVariable long gamePlayerID){
+        return this.gameViewDTO(gamePlayerRepo.findById(gamePlayerID).orElse(null));
+    }
+
+    private Map<String, Object> gameViewDTO (GamePlayer gamePlayer){
+        Map<String, Object> dto = new LinkedHashMap<>();
+        if (gamePlayer != null) {
+            dto = gamePlayer.getGame().GameWithPlayersDTO();
+            dto.put("Ships", gamePlayer.getShip().stream().map(Ship::shipDTO));
+        }else
+        { dto.put("ERROR", "no such game"); }
+
+
+            return dto;
     }
 
 
