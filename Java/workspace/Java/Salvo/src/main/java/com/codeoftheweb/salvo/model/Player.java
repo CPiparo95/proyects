@@ -2,7 +2,6 @@ package com.codeoftheweb.salvo.model;
 
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,7 +25,7 @@ public class Player {
         this.Password = password;
     }
 
-    public Map<String, Object> PlayerWithGamesDTO(){
+    public Map<String, Object> playerWithGamesDTO(){
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("player_id",this.id);
         dto.put("user_name", this.getUserName());
@@ -34,7 +33,7 @@ public class Player {
         return dto;
     }
 
-    public Map<String, Object> PlayerDTO(){
+    public Map<String, Object> playerDTO(){
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("player_id",this.id);
         dto.put("user_name", this.getUserName());

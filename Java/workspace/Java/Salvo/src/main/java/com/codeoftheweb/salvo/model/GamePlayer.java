@@ -41,7 +41,7 @@ public class GamePlayer {
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("game_player_id",this.id);
         dto.put("join_time", this.getJoinTime());
-        dto.put("game", this.getGame().GameDTO());
+        dto.put("game", this.getGame().gameDTO());
         return dto;
     }
 
@@ -49,7 +49,7 @@ public class GamePlayer {
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("game_player_id",this.id);
         dto.put("join_time", this.getJoinTime());
-        dto.put("player", this.getPlayer().PlayerDTO());
+        dto.put("player", this.getPlayer().playerDTO());
         return dto;
     }
 

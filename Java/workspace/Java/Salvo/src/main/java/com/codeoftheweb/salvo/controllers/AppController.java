@@ -3,7 +3,6 @@ import com.codeoftheweb.salvo.model.*;
 import com.codeoftheweb.salvo.repositorys.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import sun.awt.X11.XErrorEvent;
 
 import java.util.*;
 import java.util.stream.*;
@@ -26,12 +25,12 @@ public class AppController {
 
     @RequestMapping("/players")
     public List<Map<String, Object>> getPlayers(){
-        return playerRepo.findAll().stream().map(Player::PlayerWithGamesDTO).collect(Collectors.toList());
+        return playerRepo.findAll().stream().map(Player::playerWithGamesDTO).collect(Collectors.toList());
     }
 
     @RequestMapping("/games")
     public List<Map<String, Object>> getGames(){
-        return gameRepo.findAll().stream().map(Game::GameWithPlayersDTO).collect(Collectors.toList());
+        return gameRepo.findAll().stream().map(Game::gameWithPlayersDTO).collect(Collectors.toList());
     }
 
     @RequestMapping("/game_view/{gamePlayerID}")
@@ -42,7 +41,7 @@ public class AppController {
     private Map<String, Object> gameViewDTO (GamePlayer gamePlayer){
         Map<String, Object> dto = new LinkedHashMap<>();
         if (gamePlayer != null) {
-            dto = gamePlayer.getGame().GameWithPlayersDTO();
+            dto = gamePlayer.getGame().gameWithPlayersDTO();
             dto.put("Ships", gamePlayer.getShip().stream().map(Ship::shipDTO));
         }else
         { dto.put("ERROR", "no such game"); }
