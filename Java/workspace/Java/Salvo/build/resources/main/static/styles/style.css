@@ -18,14 +18,14 @@
     border: 2px solid rgb(128,128,128);
     border-bottom: 0;
     border-radius: 10px 10px 0 0;
-    background-image: url('../assets/dock-texture.jpg');
+    background-image: url('../assets/campo.jpg');
     background-size: cover;
     background-repeat: no-repeat;
 }
 
 
 #grid{
-    background-image: url(../assets/ocean.gif);
+    background-image: url(../assets/campoMove.gif);
     background-size: cover;
     border: 2px solid rgb(128,128,128);
     border-radius: 0 0 10px 10px;
@@ -145,28 +145,28 @@
 }
 
 
-#carrier .grid-item-content{
-    background-image: url('../assets/ships/carrier.png');
+#gaucho1 .grid-item-content{
+    background-image: url('../assets/ships/gaucho1.jpeg');
     background-size: 85% 100%;
 }
 
-#battleship .grid-item-content{
-    background-image: url('../assets/ships/battleship.png');
+#gaucho2 .grid-item-content{
+    background-image: url('../assets/ships/gaucho2.png');
     background-size: 85% 100%;
 }
 
-#submarine .grid-item-content{
-    background-image: url('../assets/ships/submarine.png');
+#gaucho3 .grid-item-content{
+    background-image: url('../assets/ships/gaucho3.jpg');
     background-size: 90% 100%;
 }
 
-#destroyer .grid-item-content{
-    background-image: url('../assets/ships/destroyer.png');
+#gaucho4 .grid-item-content{
+    background-image: url('../assets/ships/gaucho4.jpg');
     background-size: 100% 150%;
 }
 
-#patrol_boat .grid-item-content{
-    background-image: url('../assets/ships/patrol_boat.png');
+#gaucho5 .grid-item-content{
+    background-image: url('../assets/ships/gaucho5.jpg');
     background-size: 100% 150%;
 }
 

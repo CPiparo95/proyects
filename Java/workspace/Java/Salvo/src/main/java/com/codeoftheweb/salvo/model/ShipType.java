@@ -1,11 +1,9 @@
 package com.codeoftheweb.salvo.model;
 
 public enum ShipType {
-    AMPHIBIOUS_ASSAULT_SHIP,
-    DESTROYER_FLOTILLA_LEADER,
-    AIRCRAFT_CARRIER,
-    DESTROYER,
-    SUBMARINE,
-    HEAVY_CRUISER,
-    ARMOIRED_CRUISER
+    gaucho1,
+    gaucho2,
+    gaucho3,
+    gaucho4,
+    gaucho5
 }

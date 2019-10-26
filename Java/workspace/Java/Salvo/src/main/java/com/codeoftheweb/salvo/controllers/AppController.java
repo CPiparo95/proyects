@@ -46,7 +46,6 @@ public class AppController {
         }else
         { dto.put("ERROR", "no such game"); }
 
-
             return dto;
     }
 

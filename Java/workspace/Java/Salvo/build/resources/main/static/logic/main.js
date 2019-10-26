@@ -24,7 +24,6 @@ const app = new Vue({
             })
 
     },
-    methods: {},
     components: {
         game_list_page: {
             props: ['games'],

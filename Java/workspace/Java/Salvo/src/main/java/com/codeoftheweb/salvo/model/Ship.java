@@ -5,6 +5,7 @@ import javax.persistence.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 @Entity
 public class Ship {
@@ -25,7 +26,7 @@ public class Ship {
 
     public Ship() { }
 
-    public Ship(ShipType shiptype, Set<ShipPositions>shipPositions) {
+    public Ship(ShipType shiptype, Set<ShipPositions> shipPositions) {
         this.shipType = shiptype;
         this.shipPositions = shipPositions;
     }

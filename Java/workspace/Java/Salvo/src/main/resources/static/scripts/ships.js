@@ -205,9 +205,10 @@ const createShips = function(shipType, length, orientation, parent, isStatic){
 }
 
 let data = {}
+var params = new URLSearchParams(window.location.search)
 
     //fetch al java
-    fetch("/api/game_view/1")
+    fetch("/api/game_view/" + params.get("gp"))
         .then(function (response) {
             if (response.ok) {
                 return response.json()
@@ -217,6 +218,22 @@ let data = {}
         })
         .then(json => {
             data = json
+            data.Ships[0].ship_positions.sort()
+            data.Ships[1].ship_positions.sort()
+            data.Ships[2].ship_positions.sort()
+            data.Ships[3].ship_positions.sort()
+            data.Ships[4].ship_positions.sort()
+            
+            createShips(data.Ships[0].ship_type, data.Ships[0].ship_positions.length,
+             'vertical', document.getElementById('ships' + data.Ships[0].ship_positions[0]),true)
+            createShips(data.Ships[1].ship_type, data.Ships[1].ship_positions.length,
+             'vertical', document.getElementById('ships' + data.Ships[1].ship_positions[0]),true)
+            createShips(data.Ships[2].ship_type, data.Ships[2].ship_positions.length,
+             'vertical', document.getElementById('ships' + data.Ships[2].ship_positions[0]),true)
+            createShips(data.Ships[3].ship_type, data.Ships[3].ship_positions.length,
+             'vertical', document.getElementById('ships' + data.Ships[3].ship_positions[0]),true)
+            createShips(data.Ships[4].ship_type, data.Ships[4].ship_positions.length,
+             'vertical', document.getElementById('ships' + data.Ships[4].ship_positions[0]),true)
 
         })
         .catch(function (error) {
