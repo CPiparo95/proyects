@@ -19,6 +19,9 @@ public class GamePlayer {
     @OneToMany(mappedBy="gamePlayer", fetch=FetchType.EAGER, cascade= CascadeType.ALL)
     private Set<Ship> ship = new HashSet<>();
 
+    @OneToMany(mappedBy="gamePlayer", fetch=FetchType.EAGER, cascade= CascadeType.ALL)
+    private Set<Salvoes> salvoes = new HashSet<>();
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="player_id")
     private Player player;
@@ -68,6 +71,15 @@ public class GamePlayer {
     public void addShip(Ship ship){
         this.ship.add(ship);
         ship.setGamePlayer(this);
+    }
+
+    public Set<Salvoes> getSalvoes() {
+        return salvoes;
+    }
+
+    public void addSalvoes(Salvoes salvoes){
+        this.salvoes.add(salvoes);
+        salvoes.setGamePlayer(this);
     }
 
     public LocalDateTime getJoinTime(){

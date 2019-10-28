@@ -5,7 +5,6 @@ import javax.persistence.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 @Entity
 public class Ship {
@@ -17,7 +16,7 @@ public class Ship {
     private ShipType shipType;
 
     @ElementCollection
-    private Set<ShipPositions> shipPositions;
+    private Set<Positions> positions;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="game_player_id")
@@ -26,16 +25,16 @@ public class Ship {
 
     public Ship() { }
 
-    public Ship(ShipType shiptype, Set<ShipPositions> shipPositions) {
+    public Ship(ShipType shiptype, Set<Positions> positions) {
         this.shipType = shiptype;
-        this.shipPositions = shipPositions;
+        this.positions = positions;
     }
 
     public Map<String, Object> shipDTO(){
         Map<String, Object> dto = new LinkedHashMap<>();
-        dto.put("id",this.id);
+        dto.put("ship_id",this.id);
         dto.put("ship_type", this.getShipType());
-        dto.put("ship_positions",this.getShipPositions());
+        dto.put("ship_positions",this.getPositions());
         return dto;
     }
 
@@ -51,7 +50,7 @@ public class Ship {
         this.gamePlayer = gamePlayer;
     }
 
-    public Set<ShipPositions> getShipPositions() {
-        return shipPositions;
+    public Set<Positions> getPositions() {
+        return positions;
     }
 }

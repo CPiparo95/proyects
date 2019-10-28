@@ -7,10 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import com.codeoftheweb.salvo.repositorys.*;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 @SpringBootApplication
 public class SalvoApplication {
@@ -24,7 +22,8 @@ public class SalvoApplication {
             PlayerRepository playerRepository,
             GameRepository gameRepository,
             GamePlayerRepository gamePlayerRepository,
-            ShipRepository shipRepository) {
+            ShipRepository shipRepository,
+            SalvoesRepository salvoesRepository) {
         return (args) -> {
             // save a couple of players
             Player player1 = playerRepository.save(new Player("Jack", "nosoyhorrible"));
@@ -36,52 +35,52 @@ public class SalvoApplication {
             Game juego01 = gameRepository.save(new Game("Juego nuevo01", LocalDateTime.now()));
             Game juego02 = gameRepository.save(new Game("Juevo nuevo02", LocalDateTime.now()));
 
-            Set<ShipPositions> barco1 = new HashSet<>();
-            Set<ShipPositions> barco2 = new HashSet<>();
-            Set<ShipPositions> barco3 = new HashSet<>();
-            Set<ShipPositions> barco4 = new HashSet<>();
-            Set<ShipPositions> barco5 = new HashSet<>();
-            Set<ShipPositions> barco6 = new HashSet<>();
-            Set<ShipPositions> barco7 = new HashSet<>();
-            Set<ShipPositions> barco8 = new HashSet<>();
-            Set<ShipPositions> barco9 = new HashSet<>();
-            Set<ShipPositions> barco10 = new HashSet<>();
-            barco1.add(ShipPositions.A1);
-            barco1.add(ShipPositions.B1);
-            barco1.add(ShipPositions.C1);
-            barco1.add(ShipPositions.D1);
-            barco2.add(ShipPositions.E8);
-            barco2.add(ShipPositions.F8);
-            barco2.add(ShipPositions.G8);
-            barco3.add(ShipPositions.D3);
-            barco3.add(ShipPositions.D4);
-            barco4.add(ShipPositions.A4);
-            barco4.add(ShipPositions.B4);
-            barco4.add(ShipPositions.C4);
-            barco4.add(ShipPositions.D4);
-            barco4.add(ShipPositions.E4);
-            barco5.add(ShipPositions.A7);
-            barco5.add(ShipPositions.A8);
-            barco5.add(ShipPositions.A9);
-            barco5.add(ShipPositions.A10);
-            barco6.add(ShipPositions.C1);
-            barco6.add(ShipPositions.D1);
-            barco6.add(ShipPositions.E1);
-            barco6.add(ShipPositions.F1);
-            barco7.add(ShipPositions.C8);
-            barco7.add(ShipPositions.D8);
-            barco7.add(ShipPositions.E8);
-            barco8.add(ShipPositions.A3);
-            barco8.add(ShipPositions.A4);
-            barco9.add(ShipPositions.B4);
-            barco9.add(ShipPositions.C4);
-            barco9.add(ShipPositions.D4);
-            barco9.add(ShipPositions.E4);
-            barco9.add(ShipPositions.F4);
-            barco10.add(ShipPositions.A7);
-            barco10.add(ShipPositions.A8);
-            barco10.add(ShipPositions.A9);
-            barco10.add(ShipPositions.A10);
+            Set<Positions> barco1 = new HashSet<>();
+            Set<Positions> barco2 = new HashSet<>();
+            Set<Positions> barco3 = new HashSet<>();
+            Set<Positions> barco4 = new HashSet<>();
+            Set<Positions> barco5 = new HashSet<>();
+            Set<Positions> barco6 = new HashSet<>();
+            Set<Positions> barco7 = new HashSet<>();
+            Set<Positions> barco8 = new HashSet<>();
+            Set<Positions> barco9 = new HashSet<>();
+            Set<Positions> barco10 = new HashSet<>();
+            barco1.add(Positions.A1);
+            barco1.add(Positions.B1);
+            barco1.add(Positions.C1);
+            barco1.add(Positions.D1);
+            barco2.add(Positions.E8);
+            barco2.add(Positions.F8);
+            barco2.add(Positions.G8);
+            barco3.add(Positions.D3);
+            barco3.add(Positions.D4);
+            barco4.add(Positions.A4);
+            barco4.add(Positions.B4);
+            barco4.add(Positions.C4);
+            barco4.add(Positions.D4);
+            barco4.add(Positions.E4);
+            barco5.add(Positions.A7);
+            barco5.add(Positions.A8);
+            barco5.add(Positions.A9);
+            barco5.add(Positions.A10);
+            barco6.add(Positions.C1);
+            barco6.add(Positions.D1);
+            barco6.add(Positions.E1);
+            barco6.add(Positions.F1);
+            barco7.add(Positions.C8);
+            barco7.add(Positions.D8);
+            barco7.add(Positions.E8);
+            barco8.add(Positions.A3);
+            barco8.add(Positions.A4);
+            barco9.add(Positions.B4);
+            barco9.add(Positions.C4);
+            barco9.add(Positions.D4);
+            barco9.add(Positions.E4);
+            barco9.add(Positions.F4);
+            barco10.add(Positions.A7);
+            barco10.add(Positions.A8);
+            barco10.add(Positions.A9);
+            barco10.add(Positions.A10);
 
             Ship nave01 = shipRepository.save(new Ship(ShipType.gaucho1,barco4));
             Ship nave02 = shipRepository.save(new Ship(ShipType.gaucho2,barco3));
@@ -109,6 +108,25 @@ public class SalvoApplication {
             relacion2.addShip(nave08);
             relacion2.addShip(nave09);
             relacion2.addShip(nave10);
+
+            Set<Positions> salvoesFire01 = new HashSet<>();
+            Set<Positions> salvoesFire02 = new HashSet<>();
+            salvoesFire01.add(Positions.E1);
+            salvoesFire01.add(Positions.A1);
+            salvoesFire01.add(Positions.G10);
+            salvoesFire01.add(Positions.H7);
+            salvoesFire01.add(Positions.C2);
+            salvoesFire02.add(Positions.A5);
+            salvoesFire02.add(Positions.B2);
+            salvoesFire02.add(Positions.I6);
+            salvoesFire02.add(Positions.B3);
+            salvoesFire02.add(Positions.F9);
+
+            Salvoes salvo01 = salvoesRepository.save(new Salvoes("Turno1", salvoesFire01));
+            Salvoes salvo02 = salvoesRepository.save(new Salvoes("Turno1", salvoesFire02));
+
+            relacion1.addSalvoes(salvo01);
+            relacion2.addSalvoes(salvo02);
 
             gamePlayerRepository.save(relacion1);
             gamePlayerRepository.save(relacion2);

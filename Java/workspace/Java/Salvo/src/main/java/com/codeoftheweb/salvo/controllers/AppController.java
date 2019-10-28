@@ -23,6 +23,9 @@ public class AppController {
     @Autowired
     private GamePlayerRepository gamePlayerRepo;
 
+    @Autowired
+    private SalvoesRepository salvoesRepo;
+
     @RequestMapping("/players")
     public List<Map<String, Object>> getPlayers(){
         return playerRepo.findAll().stream().map(Player::playerWithGamesDTO).collect(Collectors.toList());
@@ -43,11 +46,10 @@ public class AppController {
         if (gamePlayer != null) {
             dto = gamePlayer.getGame().gameWithPlayersDTO();
             dto.put("Ships", gamePlayer.getShip().stream().map(Ship::shipDTO));
+            dto.put("Salvoes", gamePlayer.getSalvoes().stream().map(Salvoes::salvoesDTO));
         }else
         { dto.put("ERROR", "no such game"); }
 
             return dto;
     }
-
-
 }
