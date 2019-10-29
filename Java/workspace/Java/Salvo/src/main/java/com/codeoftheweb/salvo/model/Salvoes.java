@@ -33,6 +33,7 @@ public class Salvoes {
     public Map<String, Object> salvoesDTO(){
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("salvo_id",this.id);
+        dto.put("player_username", this.getGamePlayer().getPlayer().getUserName());
         dto.put("turn", this.getTurn());
         dto.put("fire_positions",this.getPositions());
         return dto;

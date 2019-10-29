@@ -144,6 +144,15 @@
     background-repeat: no-repeat;
 }
 
+#explosion_agua .grid-item-content{
+    background-image: url('../assets/ships/explosion_agua.jpg');
+    background-size: 85% 100%;
+}
+
+#explosion .grid-item-content{
+    background-image: url('../assets/ships/explosion.gif');
+    background-size: 85% 100%;
+}
 
 #gaucho1 .grid-item-content{
     background-image: url('../assets/ships/gaucho1.jpeg');

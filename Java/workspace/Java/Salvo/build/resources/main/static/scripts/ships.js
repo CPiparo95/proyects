@@ -218,6 +218,9 @@ var params = new URLSearchParams(window.location.search)
         })
         .then(json => {
             data = json
+            if (params.get("salvoesFire") != 1 && 
+            params.get("salvoesReceived") != 1 &&
+            params.get("ships") == 1){
             data.Ships[0].ship_positions.sort()
             data.Ships[1].ship_positions.sort()
             data.Ships[2].ship_positions.sort()
@@ -234,7 +237,19 @@ var params = new URLSearchParams(window.location.search)
              'vertical', document.getElementById('ships' + data.Ships[3].ship_positions[0]),true)
             createShips(data.Ships[4].ship_type, data.Ships[4].ship_positions.length,
              'vertical', document.getElementById('ships' + data.Ships[4].ship_positions[0]),true)
+            }else if(params.get("salvoesFire") == 1 && 
+            params.get("salvoesReceived") != 1 &&
+            params.get("ships") != 1){
+                for(n=0;n <= data.Salvoes[0].fire_positions.length; n++){
+                    createShips('explosion', 1, 'horizontal', document.getElementById('ships' + data.Salvoes[0].fire_positions[n]),true)
+                }
+            }
+            else if(params.get("salvoesFire") != 1 && 
+            params.get("salvoesReceived") == 1 &&
+            params.get("ships") != 1){
+                
 
+            }
         })
         .catch(function (error) {
             console.log(error)
