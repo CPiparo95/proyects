@@ -46,7 +46,8 @@ public class AppController {
         if (gamePlayer != null) {
             dto = gamePlayer.getGame().gameWithPlayersDTO();
             dto.put("Ships", gamePlayer.getShip().stream().map(Ship::shipDTO));
-            dto.put("Salvoes", gamePlayer.getGame().getGamePlayers().stream().flatMap(gp -> gp.getSalvoes().stream().map(Salvoes::salvoesDTO)));
+            dto.put("Salvoes", gamePlayer.getGame().getGamePlayers().stream().flatMap(gp -> gp.getSalvoes().stream()
+                    .map(Salvoes::salvoesDTO)));
         }else
         { dto.put("ERROR", "no such game"); }
 
