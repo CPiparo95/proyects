@@ -219,36 +219,61 @@ var params = new URLSearchParams(window.location.search)
         .then(json => {
             data = json
             if (params.get("salvoesFire") != 1 && 
-            params.get("salvoesReceived") != 1 &&
-            params.get("ships") == 1){
-            data.Ships[0].ship_positions.sort()
-            data.Ships[1].ship_positions.sort()
-            data.Ships[2].ship_positions.sort()
-            data.Ships[3].ship_positions.sort()
-            data.Ships[4].ship_positions.sort()
-            
-            createShips(data.Ships[0].ship_type, data.Ships[0].ship_positions.length,
-             'vertical', document.getElementById('ships' + data.Ships[0].ship_positions[0]),true)
-            createShips(data.Ships[1].ship_type, data.Ships[1].ship_positions.length,
-             'vertical', document.getElementById('ships' + data.Ships[1].ship_positions[0]),true)
-            createShips(data.Ships[2].ship_type, data.Ships[2].ship_positions.length,
-             'vertical', document.getElementById('ships' + data.Ships[2].ship_positions[0]),true)
-            createShips(data.Ships[3].ship_type, data.Ships[3].ship_positions.length,
-             'vertical', document.getElementById('ships' + data.Ships[3].ship_positions[0]),true)
-            createShips(data.Ships[4].ship_type, data.Ships[4].ship_positions.length,
-             'vertical', document.getElementById('ships' + data.Ships[4].ship_positions[0]),true)
-            }else if(params.get("salvoesFire") == 1 && 
-            params.get("salvoesReceived") != 1 &&
+            params.get("salvoesReceived") == 1 &&
             params.get("ships") != 1){
-                for(n=0;n <= data.Salvoes[0].fire_positions.length; n++){
-                    createShips('explosion', 1, 'horizontal', document.getElementById('ships' + data.Salvoes[0].fire_positions[n]),true)
+                for(n=0; n<= data.gamePlayers.length-1; n++){ //este for consulta el nombre del jugador
+                    if (data.gamePlayers[n].game_player_id == params.get("gp")){
+                        for(h=0;h <= data.Salvoes.length-1; h++){ //este for comprueba que estemos en los salvos del jugador correcto
+                            if (data.gamePlayers[n].player.user_name == data.Salvoes[h].player_username){
+                                for (l=0; l<=data.Salvoes[h].fire_positions.length-1; l++){ //finalmente crea salvoes por cada jugador
+                                    createShips('explosion', 1, 'horizontal', document.getElementById('ships' + data.Salvoes[h].fire_positions[l]),true)
+                                }
+                                break
+                            }
+                        }
+                        break
+                    }
+                }
+            }else if(params.get("salvoesFire") != 1 && 
+            params.get("salvoesReceived") == 1 &&
+            params.get("ships") == 1){
+                data.Ships.forEach(item => {
+                    //item.ship_positions.sort()
+                    createShips(item.ship_type, item.ship_positions.sort().length,
+                        'vertical', document.getElementById('ships' + item.ship_positions[0]),true)                 
+                });
+
+                
+                for(n=0; n<= data.gamePlayers.length-1; n++){ //este for consulta el nombre del jugador
+                    if (data.gamePlayers[n].game_player_id == params.get("gp")){
+                        for(h=0;h <= data.Salvoes.length-1; h++){ //este for comprueba que estemos en los salvos del jugador correcto
+                            if (data.gamePlayers[n].player.user_name == data.Salvoes[h].player_username){
+                                for (l=0; l<=data.Salvoes[h].fire_positions.length-1; l++){ //finalmente crea salvoes por cada jugador
+                                    createShips('explosion', 1, 'horizontal', document.getElementById('ships' + data.Salvoes[h].fire_positions[l]),true)
+                                }
+                                break
+                            }
+                        }
+                        break
+                    }
                 }
             }
             else if(params.get("salvoesFire") != 1 && 
             params.get("salvoesReceived") == 1 &&
             params.get("ships") != 1){
-                
-
+                for(n=0; n<= data.gamePlayers.length-1; n++){ //este for consulta el nombre del jugador
+                    if (data.gamePlayers[n].game_player_id != params.get("gp")){
+                        for(h=0;h <= data.Salvoes.length-1; h++){ //este for comprueba que estemos en los salvos del jugador correcto
+                            if (data.gamePlayers[n].player.user_name == data.Salvoes[h].player_username){
+                                for (l=0; l<=data.Salvoes[h].fire_positions.length-1; l++){ //finalmente crea salvoes por X jugador
+                                    createShips('explosion', 1, 'horizontal', document.getElementById('ships' + data.Salvoes[h].fire_positions[l]),true)
+                                }
+                                break
+                            }
+                        }
+                        break
+                    }
+                }
             }
         })
         .catch(function (error) {
