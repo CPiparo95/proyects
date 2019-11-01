@@ -23,7 +23,8 @@ public class SalvoApplication {
             GameRepository gameRepository,
             GamePlayerRepository gamePlayerRepository,
             ShipRepository shipRepository,
-            SalvoesRepository salvoesRepository) {
+            SalvoesRepository salvoesRepository,
+            ScoreRepository scoreRepository) {
         return (args) -> {
             // save a couple of players
             Player player1 = playerRepository.save(new Player("Jack", "nosoyhorrible", "jackpobre@gmail.com"));
@@ -34,6 +35,9 @@ public class SalvoApplication {
 
             Game juego01 = gameRepository.save(new Game("Juego nuevo01", LocalDateTime.now()));
             Game juego02 = gameRepository.save(new Game("Juevo nuevo02", LocalDateTime.now()));
+            Game juego03 = gameRepository.save(new Game("Juevo nuevo03", LocalDateTime.now()));
+            Game juego04 = gameRepository.save(new Game("Juevo nuevo04", LocalDateTime.now()));
+            Game juego05 = gameRepository.save(new Game("Juevo nuevo05", LocalDateTime.now()));
 
             Set<Positions> barco1 = new HashSet<>();
             Set<Positions> barco2 = new HashSet<>();
@@ -95,9 +99,18 @@ public class SalvoApplication {
 
             GamePlayer relacion1 = gamePlayerRepository.save(new GamePlayer(player1, juego01, LocalDateTime.now()));
             GamePlayer relacion2 = gamePlayerRepository.save(new GamePlayer(player2, juego01, LocalDateTime.now()));
-            GamePlayer relacion5 = gamePlayerRepository.save(new GamePlayer(player1, juego02, LocalDateTime.now()));
-            GamePlayer relacion3 = gamePlayerRepository.save(new GamePlayer(player3, juego02, LocalDateTime.now()));
-            GamePlayer relacion4 = gamePlayerRepository.save(new GamePlayer(player4, juego02, LocalDateTime.now()));
+            GamePlayer relacion3 = gamePlayerRepository.save(new GamePlayer(player1, juego02, LocalDateTime.now()));
+            GamePlayer relacion4 = gamePlayerRepository.save(new GamePlayer(player3, juego02, LocalDateTime.now()));
+            GamePlayer relacion5 = gamePlayerRepository.save(new GamePlayer(player4, juego03, LocalDateTime.now()));
+            GamePlayer relacion6 = gamePlayerRepository.save(new GamePlayer(player5, juego03, LocalDateTime.now()));
+            GamePlayer relacion7 = gamePlayerRepository.save(new GamePlayer(player2, juego04, LocalDateTime.now()));
+            GamePlayer relacion8 = gamePlayerRepository.save(new GamePlayer(player3, juego04, LocalDateTime.now()));
+
+            Score score1 = scoreRepository.save(new Score(player3, juego04, LocalDateTime.now(), 1.0));
+            Score score2 = scoreRepository.save(new Score(player2, juego04, LocalDateTime.now(), 1.0));
+            Score score3 = scoreRepository.save(new Score(player4, juego03, LocalDateTime.now(), 0.5));
+            Score score4 = scoreRepository.save(new Score(player5, juego03, LocalDateTime.now(), 0.5));
+
             relacion1.addShip(nave01);
             relacion1.addShip(nave02);
             relacion1.addShip(nave03);
