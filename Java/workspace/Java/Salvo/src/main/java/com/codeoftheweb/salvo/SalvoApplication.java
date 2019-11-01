@@ -26,11 +26,11 @@ public class SalvoApplication {
             SalvoesRepository salvoesRepository) {
         return (args) -> {
             // save a couple of players
-            Player player1 = playerRepository.save(new Player("Jack", "nosoyhorrible"));
-            Player player2 = playerRepository.save(new Player("Chloe", "soyUnapassword"));
-            Player player3 = playerRepository.save(new Player("Diana", "soyUnapassword"));
-            Player player4 = playerRepository.save(new Player("Amelia", "soyUnapassword"));
-            Player player5 = playerRepository.save(new Player("Rojelio", "soyUnapassword"));
+            Player player1 = playerRepository.save(new Player("Jack", "nosoyhorrible", "jackpobre@gmail.com"));
+            Player player2 = playerRepository.save(new Player("Chloe", "soyUnapassword","chloePP@gmail.com"));
+            Player player3 = playerRepository.save(new Player("Diana", "soyUnapassword","YoNoSoyQuieno@gmail.com"));
+            Player player4 = playerRepository.save(new Player("Amelia", "soyUnapassword","ParaHablarMalDeNadie@gmail.com"));
+            Player player5 = playerRepository.save(new Player("Rojelio", "soyUnapassword","PeroOsvaldoEraUnIrrespetuoso@gmail.com"));
 
             Game juego01 = gameRepository.save(new Game("Juego nuevo01", LocalDateTime.now()));
             Game juego02 = gameRepository.save(new Game("Juevo nuevo02", LocalDateTime.now()));
@@ -116,6 +116,8 @@ public class SalvoApplication {
             salvoesFire01.add(Positions.G10);
             salvoesFire01.add(Positions.H7);
             salvoesFire01.add(Positions.C2);
+            salvoesFire02.add(Positions.A9);
+            salvoesFire02.add(Positions.E5);
             salvoesFire02.add(Positions.A5);
             salvoesFire02.add(Positions.B2);
             salvoesFire02.add(Positions.I6);

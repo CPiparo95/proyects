@@ -137,18 +137,6 @@
     position: relative;
 }
 
-.grid-item-explotion{
-    transform-origin: 25px center;
-    position: absolute;
-}
-
-.grid-item-explotion .grid-item-content-explotion{
-    width: inherit;
-    height: inherit;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
 .grid-item .grid-item-content{
     width: inherit;
     height: inherit;
@@ -156,12 +144,12 @@
     background-repeat: no-repeat;
 }
 
-#explosion_agua .grid-item-content-explotion{
+#explosion_agua .grid-item-content{
     background-image: url('../assets/ships/explosion_agua.jpg');
     background-size: 85% 100%;
 }
 
-#explosion .grid-item-content-explotion{
+#explosion .grid-item-content{
     background-image: url('../assets/ships/explosion.gif');
     background-size: 85% 100%;
 }

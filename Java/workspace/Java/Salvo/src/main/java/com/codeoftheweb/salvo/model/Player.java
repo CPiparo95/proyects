@@ -11,6 +11,7 @@ public class Player {
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
     private long id;
+    private String email;
     private String username;
     private String Password;
 
@@ -18,16 +19,21 @@ public class Player {
     @OneToMany(mappedBy="player", fetch=FetchType.EAGER, cascade= CascadeType.ALL)
     private Set<GamePlayer> gamePlayers = new HashSet<>();
 
+    @OneToMany(mappedBy="player", fetch=FetchType.EAGER, cascade= CascadeType.ALL)
+    private Set<Score> scores = new HashSet<>();
+
     public Player() { }
 
-    public Player(String userMail, String password) {
+    public Player(String userMail, String password, String email) {
         this.username = userMail;
         this.Password = password;
+        this.email = email;
     }
 
     public Map<String, Object> playerWithGamesDTO(){
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("player_id",this.id);
+        dto.put("email",this.getEmail());
         dto.put("user_name", this.getUserName());
         dto.put("game_player", this.getGamePlayers().stream().map(GamePlayer::gameDTO));
         return dto;
@@ -37,7 +43,24 @@ public class Player {
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("player_id",this.id);
         dto.put("user_name", this.getUserName());
+        dto.put("email",this.getEmail());
         return dto;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Set<Score> getScores() {
+        return scores;
+    }
+
+    public void setScores(Set<Score> scores) {
+        this.scores = scores;
     }
 
     public String getUserName() {

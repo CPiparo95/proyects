@@ -19,6 +19,9 @@ public class Game {
     @OneToMany(mappedBy="game", fetch=FetchType.EAGER, cascade= CascadeType.ALL)
     private Set<GamePlayer> gamePlayers = new HashSet<>();
 
+    @OneToMany(mappedBy="game", fetch=FetchType.EAGER, cascade= CascadeType.ALL)
+    private Set<Score> scores = new HashSet<>();
+
     public Game() { }
 
     public Game(String gameName, LocalDateTime creationDate) {
@@ -44,6 +47,14 @@ public class Game {
         return dto;
     }
 
+    public Set<Score> getScores() {
+        return scores;
+    }
+
+    public void setScores(Set<Score> scores) {
+        this.scores = scores;
+    }
+
     public Set<GamePlayer> getGamePlayers() {
         return gamePlayers;
     }
@@ -56,3 +67,4 @@ public class Game {
         return creationDate;
     }
 }
+
