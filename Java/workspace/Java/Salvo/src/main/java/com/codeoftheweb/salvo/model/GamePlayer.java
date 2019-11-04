@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -32,9 +33,12 @@ public class GamePlayer {
 
     private LocalDateTime joinTime;
 
+    private Boolean host;
+
     public GamePlayer(){}
 
-    public GamePlayer(Player player, Game game, LocalDateTime joinTime){
+    public GamePlayer(Player player, Game game, LocalDateTime joinTime, Boolean host){
+        this.host = host;
         this.player = player;
         this.game = game;
         this.joinTime = joinTime;
@@ -43,17 +47,41 @@ public class GamePlayer {
     public Map<String, Object> gameDTO(){
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("game_player_id",this.id);
-        dto.put("join_time", this.getJoinTime());
+        dto.put("join_time", this.convertToNormalTime(getJoinTime()));
+        dto.put("is_host",this.getHost());
         dto.put("game", this.getGame().gameDTO());
+
+        Score score = this.getGame().getScoreByPlayer(this.getPlayer());
+        if (score != null){
+            dto.put("score", score.getScore());
+        }else
+            dto.put("score", null);
+
         return dto;
     }
 
     public Map<String, Object> playerDTO(){
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("game_player_id",this.id);
-        dto.put("join_time", this.getJoinTime());
+        dto.put("join_time", this.convertToNormalTime(getJoinTime()));
+        dto.put("is_host",this.getHost());
         dto.put("player", this.getPlayer().playerDTO());
+
+        Score score = this.getPlayer().getScoreByGame(this.getGame());
+        if (score != null){
+            dto.put("score", score.getScore());
+        }else
+            dto.put("score", null);
+
         return dto;
+    }
+
+    public Boolean getHost() {
+        return host;
+    }
+
+    public void setHost(Boolean host) {
+        this.host = host;
     }
 
     public Game getGame(){
@@ -85,4 +113,14 @@ public class GamePlayer {
     public LocalDateTime getJoinTime(){
         return this.joinTime;
     }
+
+    public String convertToNormalTime (LocalDateTime joinTime){
+
+        DateTimeFormatter formateador = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+
+        String formatDateTime = joinTime.format(formateador);
+
+        return formatDateTime;
+    }
+
 }

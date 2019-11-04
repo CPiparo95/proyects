@@ -7,9 +7,17 @@
         {
             "type": "chrome",
             "request": "launch",
-            "name": "Launch Chrome against localhost",
-            "url": "http://localhost:8080/grid.html?gp=1&salvoesReceived=1",
+            "name": "leaderBoard",
+            "url": "http://localhost:8080/player_leaderboard_score.html",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "grid",
+            "url": "http://localhost:8080/grid.html?gp=1&salvoesFire=1",
             "webRoot": "${workspaceFolder}"
         }
     ]
+    
 }

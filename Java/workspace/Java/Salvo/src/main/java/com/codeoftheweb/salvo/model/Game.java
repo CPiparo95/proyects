@@ -14,7 +14,6 @@ public class Game {
     @GenericGenerator(name = "native", strategy = "native")
     private long id;
     private String gameName;
-    private LocalDateTime creationDate;
 
     @OneToMany(mappedBy="game", fetch=FetchType.EAGER, cascade= CascadeType.ALL)
     private Set<GamePlayer> gamePlayers = new HashSet<>();
@@ -24,17 +23,15 @@ public class Game {
 
     public Game() { }
 
-    public Game(String gameName, LocalDateTime creationDate) {
+    public Game(String gameName) {
 
         this.gameName = gameName;
-        this.creationDate = creationDate;
     }
 
     public Map<String, Object> gameDTO(){
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("game_id",this.id);
         dto.put("game_name", this.getGameName());
-        dto.put("creation_date", this.getCreationDate());
         return dto;
     }
 
@@ -42,9 +39,20 @@ public class Game {
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("game_id",this.id);
         dto.put("game_name", this.getGameName());
-        dto.put("creation_date", this.getCreationDate());
-        dto.put("gamePlayers", this.getGamePlayers().stream().map(GamePlayer::playerDTO));
+        dto.put("game_players", this.getGamePlayers().stream().map(GamePlayer::playerDTO));
         return dto;
+    }
+
+    public Score getScoreByPlayer(Player player){
+        return this.scores.stream().filter(score -> score.getPlayer().getId() == player.getId()).findFirst().orElse(null);
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public Set<Score> getScores() {
@@ -61,10 +69,6 @@ public class Game {
 
     public String getGameName() {
         return gameName;
-    }
-
-    public LocalDateTime getCreationDate() {
-        return creationDate;
     }
 }
 

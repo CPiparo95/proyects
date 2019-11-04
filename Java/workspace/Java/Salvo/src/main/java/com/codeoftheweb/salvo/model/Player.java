@@ -63,6 +63,18 @@ public class Player {
         this.scores = scores;
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public Score getScoreByGame(Game game){
+        return this.scores.stream().filter(score -> score.getGame().getId() == game.getId()).findFirst().orElse(null);
+    }
+
     public String getUserName() {
         return username;
     }
