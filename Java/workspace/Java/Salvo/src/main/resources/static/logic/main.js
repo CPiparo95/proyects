@@ -79,23 +79,39 @@ const app = new Vue({
                         `
         },
         player_boardscore_page: {
-            data: {scores: [
-                { win : 0, total : 0, lost : 0, tied : 0 }
-                ]},
-            methods: {
-                calculate: function(game_players){
-                    for (a=0; a<= game_players.lenght -1; a++){
-                        if (game_players[a].score == 0.0){
-                            lost ++
-                        }else if (game_players[a].score == 0.5){
-                            tied ++
-                        }else if (game_players[a].score == 1.0){
-                            win ++
-                        }
-                    };
-                    total = this.win + (this.tied/2)
+            data: function(){
+                return {
+                    scores: []
                 }
+            },
+            created() {
+                this.calculate(this.players)
+            },
+            methods: {
+                calculate: function(players){
 
+                    players.forEach(player => {
+                        let obj = {}
+                        obj.id = player.player_id
+                        obj.username = player.user_name
+                        obj.win = 0
+                        obj.total = 0
+                        obj.lost = 0
+                        obj.tied = 0
+
+                        player.game_player.forEach(gp =>{
+                            if (gp.score == 0.0){
+                                obj.lost ++
+                            }else if (gp.score == 0.5){
+                                obj.tied ++
+                            }else if (gp.score == 1.0){
+                                obj.win ++
+                            }  
+                        })
+                        obj.total = obj.win + (obj.tied/2)
+                        this.scores.push(obj)
+                    });
+                }
             },
             props: ['players'],
             template: `
@@ -115,14 +131,13 @@ const app = new Vue({
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="player in players">
-                                            <th scope="row">{{player.player_id}}</th>
-                                            <td>{{player.user_name}}</td>
-                                            
+                                        <tr v-for="score in scores">
+                                            <th scope="row">{{score.id}}</th>
+                                            <td>{{score.username}}</td>
                                             <td>{{score.total}}</td>
-                                            <td> {{lost}} </td>
-                                            <td> {{}} </td>
-                                            <td> {{}} </td>
+                                            <td> {{score.win}} </td>
+                                            <td> {{score.lost}} </td>
+                                            <td> {{score.tied}} </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -131,6 +146,5 @@ const app = new Vue({
                         </div>
                         `
         },
-
     }
 })

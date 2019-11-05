@@ -14,7 +14,7 @@
 
 <body>
   <div id="app">
-    <template>
+    <template v-if="list_players.length > 0">
        <player_boardscore_page :players="list_players"> </player_boardscore_page>
     </template>
 

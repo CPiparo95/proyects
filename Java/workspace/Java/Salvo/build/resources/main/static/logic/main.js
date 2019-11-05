@@ -66,10 +66,10 @@ const app = new Vue({
                                         <tr v-for="game in games">
                                             <th scope="row">{{game.game_id}}</th>
                                             <td>{{game.game_name}}</td>
-                                            <td v-for="gp in game.gamePlayers" v-if="gp.is_host"> {{gp.join_time}} </td>
-                                            <td v-for="gp in game.gamePlayers" v-if="gp.is_host"> {{gp.player.user_name}} </td>
-                                            <td v-for="gp in game.gamePlayers" v-if="gp.is_host == false"> {{gp.player.user_name}} </td>
-                                            <td v-for="gp in game.gamePlayers" v-if="gp.is_host == false"> {{gp.join_time}} </td>
+                                            <td v-for="gp in game.game_players" v-if="gp.is_host"> {{gp.join_time}} </td>
+                                            <td v-for="gp in game.game_players" v-if="gp.is_host"> {{gp.player.user_name}} </td>
+                                            <td v-for="gp in game.game_players" v-if="gp.is_host == false"> {{gp.player.user_name}} </td>
+                                            <td v-for="gp in game.game_players" v-if="gp.is_host == false"> {{gp.join_time}} </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -79,8 +79,40 @@ const app = new Vue({
                         `
         },
         player_boardscore_page: {
+            data: function(){
+                return {
+                    scores: []
+                }
+            },
+            methods: {
+                calculate: function(players){
+
+                    players.forEach(player => {
+                        let obj = {}
+                        obj.id = player.player_id
+                        obj.username = player.user_name
+                        obj.win = 0
+                        obj.total = 0
+                        obj.lost = 0
+                        obj.tied = 0
+
+                        player.game_player.forEach(gp =>{
+                            if (gp.score == 0.0){
+                                obj.lost ++
+                            }else if (gp.score == 0.5){
+                                obj.tied ++
+                            }else if (gp.score == 1.0){
+                                obj.win ++
+                            }  
+                        })
+                        obj.total = obj.win + (obj.tied/2)
+                        this.scores.push(obj)
+                    });
+                }
+            },
             props: ['players'],
             template: `
+                        {{calculate(players)}}
                         <div>
                             <div class="text-center">
                                 <img id="imagenFondo" src="images/playstation.jpg" class="rounded">
@@ -97,13 +129,13 @@ const app = new Vue({
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="player in players">
-                                            <th scope="row">{{game.game_id}}</th>
-                                            <td>{{game.game_name}}</td>
-                                            <td v-for="gp in game.gamePlayers" v-if="gp.is_host"> {{gp.join_time}} </td>
-                                            <td v-for="gp in game.gamePlayers" v-if="gp.is_host"> {{gp.player.user_name}} </td>
-                                            <td v-for="gp in game.gamePlayers" v-if="gp.is_host == false"> {{gp.player.user_name}} </td>
-                                            <td v-for="gp in game.gamePlayers" v-if="gp.is_host == false"> {{gp.join_time}} </td>
+                                        <tr v-for="score in scores">
+                                            <th scope="row">{{score.id}}</th>
+                                            <td>{{score.user_name}}</td>
+                                            <td>{{score.total}}</td>
+                                            <td> {{score.win}} </td>
+                                            <td> {{score.lost}} </td>
+                                            <td> {{score.tied}} </td>
                                         </tr>
                                     </tbody>
                                 </table>
