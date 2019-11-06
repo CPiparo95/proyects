@@ -1,11 +1,14 @@
 package com.codeoftheweb.salvo;
 
 import com.codeoftheweb.salvo.model.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import com.codeoftheweb.salvo.repositorys.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,6 +20,9 @@ public class SalvoApplication {
         SpringApplication.run(SalvoApplication.class);
     }
 
+    @Autowired
+    PasswordEncoder encoder;
+
     @Bean
     public CommandLineRunner initData(
             PlayerRepository playerRepository,
@@ -27,11 +33,11 @@ public class SalvoApplication {
             ScoreRepository scoreRepository) {
         return (args) -> {
             // save a couple of players
-            Player player1 = playerRepository.save(new Player("Jack", "nosoyhorrible", "jackpobre@gmail.com"));
-            Player player2 = playerRepository.save(new Player("Chloe", "soyUnapassword","chloePP@gmail.com"));
-            Player player3 = playerRepository.save(new Player("Diana", "soyUnapassword","YoNoSoyQuien@gmail.com"));
-            Player player4 = playerRepository.save(new Player("Amelia", "soyUnapassword","ParaHablarMalDeNadie@gmail.com"));
-            Player player5 = playerRepository.save(new Player("Rojelio", "soyUnapassword","PeroOsvaldoEraUnIrrespetuoso@gmail.com"));
+            Player player1 = playerRepository.save(new Player("Jack", encoder.encode("nosoyhorrible"), "jackpobre@gmail.com"));
+            Player player2 = playerRepository.save(new Player("Chloe", encoder.encode("soyUnapassword"),"chloePP@gmail.com"));
+            Player player3 = playerRepository.save(new Player("Diana", encoder.encode("soyUnapassword"),"YoNoSoyQuien@gmail.com"));
+            Player player4 = playerRepository.save(new Player("Amelia", encoder.encode("soyUnapassword"),"ParaHablarMalDeNadie@gmail.com"));
+            Player player5 = playerRepository.save(new Player("Rojelio", encoder.encode("soyUnapassword"),"PeroOsvaldoEraUnIrrespetuoso@gmail.com"));
 
             Game juego01 = gameRepository.save(new Game("Juego nuevo01"));
             Game juego02 = gameRepository.save(new Game("Juevo nuevo02"));

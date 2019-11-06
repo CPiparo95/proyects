@@ -2,6 +2,8 @@ package com.codeoftheweb.salvo.controllers;
 import com.codeoftheweb.salvo.model.*;
 import com.codeoftheweb.salvo.repositorys.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -32,8 +34,16 @@ public class AppController {
     }
 
     @RequestMapping("/games")
-    public List<Map<String, Object>> getGames(){
-        return gameRepo.findAll().stream().map(Game::gameWithPlayersDTO).collect(Collectors.toList());
+    public Map<String, Object> getGames(Authentication authentication){
+        Map<String, Object> dto = new LinkedHashMap<>();
+
+        if(isGuest(authentication))
+            dto.put("player", "guest");
+        else
+            dto.put("player", playerRepo.findByUsername(authentication.getName()).playerDTO());
+
+        dto.put("games", gameRepo.findAll().stream().map(Game::gameWithPlayersDTO).collect(Collectors.toList()));
+        return dto;
     }
 
     @RequestMapping("/game_view/{gamePlayerID}")
@@ -52,5 +62,11 @@ public class AppController {
         { dto.put("ERROR", "no such game"); }
 
             return dto;
+    }
+
+
+
+    private boolean isGuest(Authentication authentication) {
+        return authentication == null || authentication instanceof AnonymousAuthenticationToken;
     }
 }
