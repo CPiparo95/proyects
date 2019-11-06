@@ -84,6 +84,9 @@ const app = new Vue({
                     scores: []
                 }
             },
+            created() {
+                this.calculate(this.players)
+            },
             methods: {
                 calculate: function(players){
 
@@ -112,7 +115,6 @@ const app = new Vue({
             },
             props: ['players'],
             template: `
-                        {{calculate(players)}}
                         <div>
                             <div class="text-center">
                                 <img id="imagenFondo" src="images/playstation.jpg" class="rounded">
@@ -131,7 +133,7 @@ const app = new Vue({
                                     <tbody>
                                         <tr v-for="score in scores">
                                             <th scope="row">{{score.id}}</th>
-                                            <td>{{score.user_name}}</td>
+                                            <td>{{score.username}}</td>
                                             <td>{{score.total}}</td>
                                             <td> {{score.win}} </td>
                                             <td> {{score.lost}} </td>
@@ -144,6 +146,5 @@ const app = new Vue({
                         </div>
                         `
         },
-
     }
 })

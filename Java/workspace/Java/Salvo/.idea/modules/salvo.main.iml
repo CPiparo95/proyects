@@ -15,8 +15,8 @@
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-web:2.1.8.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-aop:2.1.8.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-jdbc:2.1.8.RELEASE" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.h2database:h2:1.4.199" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-json:2.1.8.RELEASE" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.h2database:h2:1.4.199" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter:2.1.8.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.security:spring-security-config:5.1.6.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.security:spring-security-web:5.1.6.RELEASE" level="project" />
