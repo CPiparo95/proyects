@@ -2,8 +2,11 @@ package com.codeoftheweb.salvo.controllers;
 import com.codeoftheweb.salvo.model.*;
 import com.codeoftheweb.salvo.repositorys.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -12,6 +15,9 @@ import java.util.stream.*;
 @RestController
 @RequestMapping("/api")
 public class AppController {
+
+    @Autowired
+    PasswordEncoder encoder;
 
     @Autowired
     private ShipRepository shipRepo;
@@ -31,6 +37,25 @@ public class AppController {
     @RequestMapping("/players")
     public List<Map<String, Object>> getPlayers(){
         return playerRepo.findAll().stream().map(Player::playerWithGamesDTO).collect(Collectors.toList());
+    }
+
+    @RequestMapping(value = "/players", method = RequestMethod.POST)
+    public ResponseEntity<Object> register(
+            @RequestParam String email,
+            @RequestParam String username,
+            @RequestParam String password){
+
+        if (email.isEmpty() || password.isEmpty()) {
+            return new ResponseEntity<>("no ves que hay campos vacios flaco?", HttpStatus.FORBIDDEN);
+        }
+
+        if(playerRepo.findByUsername(username) != null){
+            return new ResponseEntity<>("el usuario que elegiste ya existe, probaste apagando y volviendo a encender?", HttpStatus.FORBIDDEN);
+        }
+
+        playerRepo.save(new Player(username,encoder.encode(password),email));
+        return new ResponseEntity<>(HttpStatus.CREATED);
+
     }
 
     @RequestMapping("/games")

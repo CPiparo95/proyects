@@ -40,12 +40,19 @@ import javax.servlet.http.HttpSession;
     @Override
     public void init(AuthenticationManagerBuilder auth) throws  Exception{
         auth.userDetailsService(inputName ->{
-            Player player = playerRepo.findByUsername(inputName); //preguntar que hace el metodo findByEmail, que dato va a buscar? sobre que valida?
+            Player player = playerRepo.findByUsername(inputName);
             if (player != null) {
-                return new User(player.getUserName(), player.getPassword(), //suponiendo que encuentre el supuesto dato, porque devuelve email y pass?
-                        AuthorityUtils.createAuthorityList("USER")); //aca le genera un rol si lo encuntra? que pasa si lo encuentra 2 veces? sigue reasignandole el mismo rol
+                if (player.getUserName().equals("Claudio")){
+                    System.out.println("Response: Authenticated, acquiring role...");
+                    return new User(player.getUserName(), player.getPassword(),
+                            AuthorityUtils.createAuthorityList("ADMIN"));
+                }else {
+                    System.out.println("Response: Authenticated, acquiring role...");
+                    return new User(player.getUserName(), player.getPassword(),
+                            AuthorityUtils.createAuthorityList("USER"));
+                }
             } else {
-                throw new UsernameNotFoundException("Unknown user: " + inputName);
+                throw new UsernameNotFoundException("Response: ERROR, USER IS NOT AUTHENTICATED: "+ "'" + inputName + "'");
             }
         });
     }
@@ -65,12 +72,14 @@ import javax.servlet.http.HttpSession;
          http.authorizeRequests()
                  .antMatchers("/rest/**").hasAuthority("ADMIN")
                  .antMatchers("/api/game_view/**").hasAnyAuthority("USER","ADMIN")
+                 .antMatchers("/api/grid.html").hasAnyAuthority("USER","ADMIN")
+                 .antMatchers("/api/games", "/api/players").permitAll()
                  .and()
                  .formLogin()
-                 .usernameParameter("name")
-                 .passwordParameter("pwd")
-                 .loginPage("/app/login");
-         http.logout().logoutUrl("/app/logout");
+                 .usernameParameter("username")
+                 .passwordParameter("password")
+                 .loginPage("/api/login");
+         http.logout().logoutUrl("/api/logout");
 
          // turn off checking for CSRF tokens
          http.csrf().disable();

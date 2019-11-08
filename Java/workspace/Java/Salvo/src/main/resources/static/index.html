@@ -14,8 +14,18 @@
 
 <body>
   <div id="app">
+    
+      <nav style="border: 2px solid black">
+          <ul style="list-style-type: none; display: flex; justify-content: space-around;">
+              <li><button type="button" class="btn btn-primary"><a @click="actual_page = 'game_list_page'"> Games Index </a></button></li>
+              <li><button type="button" class="btn btn-primary"><a @click="actual_page = 'login_page'">Log in</a></button></li>
+              <li><button type="button" class="btn btn-primary"><a @click="actual_page = 'players_list_page'">Players Index</a></button></li>
+          </ul>
+      </nav>
+
     <template>
-       <game_list_page :games="list_games"> </game_list_page>
+       <game_list_page :games="list_games" v-if="list_games.length > 0 && actual_page == 'game_list_page'"> </game_list_page>
+       <login_page v-if="actual_page == 'login_page'"> </login_page>
     </template>
 
 

@@ -217,16 +217,6 @@ fetch("/api/game_view/" + params.get("gp"))
         }
     })
     .then(json => {
-
-        /* let shot = document.createElement("img");
-            shot.setAttribute("src", "assets/Cogs.png");
-            shot.style.zIndex = 10;
-            shot.style.width = "30px";
-            shot.style.height = "30px";
-            shot.style.margin = "2.5px";
-            shot.style.position = "absolute";
-            document.getElementById("ships" + salvoe).appendChild(shot); */
-
         data = json
         if (params.get("salvoesFire") == 1 &&
             params.get("ships") != 1) {

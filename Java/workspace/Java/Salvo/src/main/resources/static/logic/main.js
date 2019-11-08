@@ -17,7 +17,7 @@ const app = new Vue({
                 }
             })
             .then(json => {
-                app.list_games = json
+                app.list_games = json.games
 
             })
             .catch(function (error) {
@@ -146,5 +146,43 @@ const app = new Vue({
                         </div>
                         `
         },
-    }
-})
+        login_page: {
+            props: [],
+            methods: {
+                Login: Function(username, password){
+                    if (username.isEmpty() || password.isEmpty()) {
+
+                    }
+                }
+            },
+            template: `
+                        <div>
+                            <div class="sidenav">
+                                <div class="login-main-text">
+                                    <h2>Application<br> Login Page</h2>
+                                    <p>Login or register from here to access.</p>
+                                </div>
+                            </div>
+                            <div class="main">
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="login-form">
+                                        <form>
+                                            <div class="form-group">
+                                                <label>User Name</label>
+                                                <input type="text" class="form-control" placeholder="User Name" name="">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Password</label>
+                                                <input type="password" class="form-control" placeholder="Password" name="">
+                                            </div>
+                                            <button type="submit" class="btn btn-black">Log in</button>
+                                            <button type="submit" class="btn btn-secondary">Register</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `
+                    },
+                }
+            })

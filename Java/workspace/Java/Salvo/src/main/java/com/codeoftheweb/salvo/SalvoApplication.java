@@ -38,6 +38,7 @@ public class SalvoApplication {
             Player player3 = playerRepository.save(new Player("Diana", encoder.encode("soyUnapassword"),"YoNoSoyQuien@gmail.com"));
             Player player4 = playerRepository.save(new Player("Amelia", encoder.encode("soyUnapassword"),"ParaHablarMalDeNadie@gmail.com"));
             Player player5 = playerRepository.save(new Player("Rojelio", encoder.encode("soyUnapassword"),"PeroOsvaldoEraUnIrrespetuoso@gmail.com"));
+            Player player6 = playerRepository.save(new Player("Claudio", encoder.encode("Rola"),"Claudiodpiparo@gmail.com"));
 
             Game juego01 = gameRepository.save(new Game("Juego nuevo01"));
             Game juego02 = gameRepository.save(new Game("Juevo nuevo02"));
