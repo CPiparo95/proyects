@@ -6,8 +6,7 @@ const app = new Vue({
         list_games: [],
     },
     created: () => {
-        
-        if (window.location.href == "http://localhost:8080/index.html") {  //fetch al java
+        //fetch al java
         fetch("/api/games")
             .then(function (response) {
                 if (response.ok) {
@@ -23,8 +22,6 @@ const app = new Vue({
             .catch(function (error) {
                 console.log(error)
             })
-        }
-        else if(window.location.href == "http://localhost:8080/player_leaderboard_score.html") {
             fetch("/api/players")
             .then(function (response) {
                 if (response.ok) {
@@ -40,7 +37,6 @@ const app = new Vue({
             .catch(function (error) {
                 console.log(error)
             })
-        }
         
     },
     components: {
@@ -148,29 +144,73 @@ const app = new Vue({
         },
         login_page: {
             props: [],
+            data: function(){
+                return {
+                    chicho: "",
+                    perro: ""
+                }
+            },
+             methods: {
+                register: function(ev){
+                    let form = ev.target
+                    let result = true
+                    if (form.username.value == "" || form.password.value == "") {
+                        alert("flaco, llename TODOS los campos")
+                        return false
+                    }else{
+                        //fetch a LOGIN
+                        let formdata = new FormData();
+                        formdata.append("username", form.username.value)
+                        formdata.append("password", form.password.value)
+                        return fetch("/api/login",{
+                            method: "Post",
+                            body: formdata
+                        })
+                        .then(function (response) {
+                            //if (response.ok) {
+                                return response.json()
+                            //} else {
+                               // throw new Error(response.status)
+                            //}
+                        })
+                        .then(json => {
+                            alert(json)
+            
+                        })
+                        .catch(function (error) {
+                            console.log(error)
+                        })
+                    }
+                }
+            },
             template: `
-            <div class="container login-container">
-            <div class="row">
-                <div class="col-md-6 login-form-2">
-                    <h3>Log in</h3>
-                    <form>
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Your Email *" value="" />
+                        <div>
+                            <div class="sidenav">
+                                <div class="login-main-text">
+                                    <h2>Application<br> Login Page</h2>
+                                    <p>Login or register from here to access.</p>
+                                </div>
+                            </div>
+                            <div class="main">
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="login-form">
+                                        <form v-on:submit.prevent="register($event)">
+                                            <div class="form-group">
+                                                <label>User Name</label>
+                                                <input type="text" class="form-control" placeholder="User Name" name="username">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Password</label>
+                                                <input type="password" class="form-control" placeholder="Password" name="password">
+                                            </div>
+                                            <button type="submit" class="btn btn-black">Log in</button>
+                                            <button type="submit" class="btn btn-secondary">Register</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <input type="password" class="form-control" placeholder="Your Password *" value="" />
-                        </div>
-                        <div class="form-group">
-                            <input type="submit" class="btnSubmit" value="Login" />
-                        </div>
-                        <div class="form-group">
-                            <a href="#" class="ForgetPwd" value="Login">Forget Password?</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-                        `
-        },
-    }
-})
+                    `
+                    },
+                }
+            })

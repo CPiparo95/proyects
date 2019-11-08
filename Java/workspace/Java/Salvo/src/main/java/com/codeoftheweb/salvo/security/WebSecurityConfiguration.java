@@ -39,7 +39,7 @@ import javax.servlet.http.HttpSession;
 
     @Override
     public void init(AuthenticationManagerBuilder auth) throws  Exception{
-        auth.userDetailsService(inputName ->{
+        auth.userDetailsService((inputName) ->{
             Player player = playerRepo.findByUsername(inputName);
             if (player != null) {
                 if (player.getUserName().equals("Claudio")){
@@ -72,8 +72,7 @@ import javax.servlet.http.HttpSession;
          http.authorizeRequests()
                  .antMatchers("/rest/**").hasAuthority("ADMIN")
                  .antMatchers("/api/game_view/**").hasAnyAuthority("USER","ADMIN")
-                 .antMatchers("/api/grid.html").hasAnyAuthority("USER","ADMIN")
-                 .antMatchers("/api/games", "/api/players").permitAll()
+                 .antMatchers("/grid.html").hasAnyAuthority("USER","ADMIN")
                  .and()
                  .formLogin()
                  .usernameParameter("username")

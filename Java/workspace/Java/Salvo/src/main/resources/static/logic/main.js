@@ -6,8 +6,7 @@ const app = new Vue({
         list_games: [],
     },
     created: () => {
-        
-        if (window.location.href == "http://localhost:8080/index.html") {  //fetch al java
+        //fetch al java
         fetch("/api/games")
             .then(function (response) {
                 if (response.ok) {
@@ -23,8 +22,6 @@ const app = new Vue({
             .catch(function (error) {
                 console.log(error)
             })
-        }
-        else if(window.location.href == "http://localhost:8080/player_leaderboard_score.html") {
             fetch("/api/players")
             .then(function (response) {
                 if (response.ok) {
@@ -40,7 +37,6 @@ const app = new Vue({
             .catch(function (error) {
                 console.log(error)
             })
-        }
         
     },
     components: {
@@ -148,10 +144,42 @@ const app = new Vue({
         },
         login_page: {
             props: [],
-            methods: {
-                Login: Function(username, password){
-                    if (username.isEmpty() || password.isEmpty()) {
-
+            data: function(){
+                return {
+                    chicho: "",
+                    perro: ""
+                }
+            },
+             methods: {
+                register: function(ev){
+                    let form = ev.target
+                    let result = true
+                    if (form.username.value == "" || form.password.value == "") {
+                        alert("flaco, llename TODOS los campos")
+                        return false
+                    }else{
+                        //fetch a LOGIN
+                        let formdata = new FormData();
+                        formdata.append("username", form.username.value)
+                        formdata.append("password", form.password.value)
+                        return fetch("/api/login",{
+                            method: "Post",
+                            body: formdata
+                        })
+                        .then(function (response) {
+                            //if (response.ok) {
+                                return response.json()
+                            //} else {
+                               // throw new Error(response.status)
+                            //}
+                        })
+                        .then(json => {
+                            alert(json)
+            
+                        })
+                        .catch(function (error) {
+                            console.log(error)
+                        })
                     }
                 }
             },
@@ -166,14 +194,14 @@ const app = new Vue({
                             <div class="main">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="login-form">
-                                        <form>
+                                        <form v-on:submit.prevent="register($event)">
                                             <div class="form-group">
                                                 <label>User Name</label>
-                                                <input type="text" class="form-control" placeholder="User Name" name="">
+                                                <input type="text" class="form-control" placeholder="User Name" name="username">
                                             </div>
                                             <div class="form-group">
                                                 <label>Password</label>
-                                                <input type="password" class="form-control" placeholder="Password" name="">
+                                                <input type="password" class="form-control" placeholder="Password" name="password">
                                             </div>
                                             <button type="submit" class="btn btn-black">Log in</button>
                                             <button type="submit" class="btn btn-secondary">Register</button>

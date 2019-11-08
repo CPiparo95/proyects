@@ -25,7 +25,10 @@
 
     <template>
        <game_list_page :games="list_games" v-if="list_games.length > 0 && actual_page == 'game_list_page'"> </game_list_page>
+       
        <login_page v-if="actual_page == 'login_page'"> </login_page>
+       
+       <player_boardscore_page v-if="actual_page == 'players_list_page'" :players="list_players"> </player_boardscore_page>
     </template>
 
 
