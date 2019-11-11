@@ -146,12 +146,12 @@ const app = new Vue({
             props: [],
             data: function(){
                 return {
-                    chicho: "",
-                    perro: ""
+                    login: true,
+                    logout: false
                 }
             },
              methods: {
-                register: function(ev){
+                log: function(ev){
                     let form = ev.target
                     let result = true
                     if (form.username.value == "" || form.password.value == "") {
@@ -166,22 +166,34 @@ const app = new Vue({
                             method: "Post",
                             body: formdata
                         })
-                        .then(function (response) {
-                            //if (response.ok) {
-                                return response.json()
-                            //} else {
-                               // throw new Error(response.status)
-                            //}
-                        })
-                        .then(json => {
-                            alert(json)
-            
+                        .then(response =>{
+                            if (response.status==401) {
+                                alert("Error en las credenciales. No son correctas")
+                                this.login= true
+                                this.logout= false
+                            }else if(response.status==200) {
+                                alert("Se a conectado exitosamente || " + "El usuario se llama: " + form.username.value )
+                                this.login= false
+                                this.logout = true
+                            }
                         })
                         .catch(function (error) {
                             console.log(error)
                         })
                     }
-                }
+                },
+                logOut: function(ev){
+                    return fetch("/api/logout",{
+                        method: "Post"
+                    })
+                    .then(response =>{
+                         if(response.status==200) {
+                            alert("Se a desconectado correctamente")
+                            this.login= true
+                            this.logout = false
+                            }
+                        })
+                    }
             },
             template: `
                         <div>
@@ -191,10 +203,11 @@ const app = new Vue({
                                     <p>Login or register from here to access.</p>
                                 </div>
                             </div>
-                            <div class="main">
+
+                            <div v-if="login" class="main">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="login-form">
-                                        <form v-on:submit.prevent="register($event)">
+                                        <form v-on:submit.prevent="log($event)">
                                             <div class="form-group">
                                                 <label>User Name</label>
                                                 <input type="text" class="form-control" placeholder="User Name" name="username">
@@ -203,8 +216,17 @@ const app = new Vue({
                                                 <label>Password</label>
                                                 <input type="password" class="form-control" placeholder="Password" name="password">
                                             </div>
-                                            <button type="submit" class="btn btn-black">Log in</button>
-                                            <button type="submit" class="btn btn-secondary">Register</button>
+                                            <button v-show="login" type="submit" class="btn btn-black">Log in</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div v-if="logout" class="main">
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="login-form">
+                                        <form v-on:submit.prevent="logOut($event)">
+                                            <button v-show="logout" type="submit" class="btn btn-secondary">Log Out</button>
                                         </form>
                                     </div>
                                 </div>
