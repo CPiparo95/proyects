@@ -43,11 +43,9 @@ import javax.servlet.http.HttpSession;
             Player player = playerRepo.findByUsername(inputName);
             if (player != null) {
                 if (player.getUserName().equals("Claudio")){
-                    System.out.println("Response: Authenticated, acquiring role...");
                     return new User(player.getUserName(), player.getPassword(),
                             AuthorityUtils.createAuthorityList("ADMIN"));
                 }else {
-                    System.out.println("Response: Authenticated, acquiring role...");
                     return new User(player.getUserName(), player.getPassword(),
                             AuthorityUtils.createAuthorityList("USER"));
                 }

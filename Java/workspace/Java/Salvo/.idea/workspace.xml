@@ -18,13 +18,11 @@
       <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/codeoftheweb/salvo/model/Player.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/codeoftheweb/salvo/model/Player.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/codeoftheweb/salvo/security/WebSecurityConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/codeoftheweb/salvo/security/WebSecurityConfig.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/codeoftheweb/salvo/security/WebSecurityConfigurationAuthentication.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/codeoftheweb/salvo/security/WebSecurityConfigurationAuthentication.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/resources/main/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/build/resources/main/static/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/resources/main/static/logic/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/build/resources/main/static/logic/main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/resources/main/static/styles/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/build/resources/main/static/styles/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/codeoftheweb/salvo/controllers/AppController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/codeoftheweb/salvo/controllers/AppController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/codeoftheweb/salvo/repositorys/GameRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/codeoftheweb/salvo/repositorys/GameRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/codeoftheweb/salvo/security/WebSecurityConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/codeoftheweb/salvo/security/WebSecurityConfiguration.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/logic/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/logic/main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/player_leaderboard_score.html" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

@@ -40,20 +40,47 @@ public class AppController {
     }
 
     @RequestMapping(value = "/players", method = RequestMethod.POST)
-    public ResponseEntity<Object> register(
+    public ResponseEntity<Map<String,Object>> register(
             @RequestParam String email,
             @RequestParam String username,
             @RequestParam String password){
 
+        Map<String,Object> map = new HashMap<>();
+
         if (email.isEmpty() || password.isEmpty()) {
-            return new ResponseEntity<>("no ves que hay campos vacios flaco?", HttpStatus.FORBIDDEN);
+            map.put("error", "no ves que hay campos vacios flaco?");
+            return new ResponseEntity<>(map, HttpStatus.FORBIDDEN);
         }
 
         if(playerRepo.findByUsername(username) != null){
-            return new ResponseEntity<>("el usuario que elegiste ya existe, probaste apagando y volviendo a encender?", HttpStatus.FORBIDDEN);
+            map.put("error", "el usuario que elegiste ya existe, probaste apagando y volviendo a encender?");
+            return new ResponseEntity<>(map, HttpStatus.FORBIDDEN);
         }
 
         playerRepo.save(new Player(username,encoder.encode(password),email));
+        map.put("error", "mensaje de prueba, soy un user creado");
+        return new ResponseEntity<>(map,HttpStatus.CREATED);
+
+    }
+
+    @RequestMapping(value = "/games", method = RequestMethod.POST)
+    public ResponseEntity<Object> createGame(
+            @RequestParam String gameName,
+            @RequestParam String userName){
+
+        if (gameName.isEmpty() || userName.isEmpty()) {
+            return new ResponseEntity<>("te haces el pistola tocandome el back?", HttpStatus.FORBIDDEN);
+        }
+
+        if(playerRepo.findByUsername(userName) != null){
+            return new ResponseEntity<>("el usuario que elegiste ya existe, probaste apagando y volviendo a encender?", HttpStatus.FORBIDDEN);
+        }
+
+        if(gameRepo.findByGameName(gameName) != null){
+            return new ResponseEntity<>("el nombre de juego ya existe, elija otro", HttpStatus.FORBIDDEN);
+        }
+
+        gameRepo.save(new Game(gameName));
         return new ResponseEntity<>(HttpStatus.CREATED);
 
     }

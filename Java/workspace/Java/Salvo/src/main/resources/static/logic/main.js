@@ -181,6 +181,7 @@ const app = new Vue({
                             body: formdata
                         })
                         .then(response =>{
+                            //NO RESOLVER LA RESPUESTA, LOGUEO MANEJADO POR SPRING, NO ES POSIBLE MANEJAR EL JSON
                             if (response.status==401) {
                                 alert("Error en las credenciales. No son correctas")
                             }else if(response.status==200) {
@@ -212,12 +213,15 @@ const app = new Vue({
                         })
                         .then(response =>{
                             if (response.status==403) {
-                                alert("El nombre de usuario ya se encuentra en uso. Eliga otro")
+                                return response.json()
                             }else if(response.status==201) {
-                                alert("Se ha registrado exitosamente :) como: " + form.username.value )
                                 this.login= true
                                 this.register= false
+                                return response.json()
                             }
+                        })
+                        .then(json =>{
+                            alert(json)
                         })
                         .catch(function (error) {
                             console.log(error)

@@ -183,11 +183,16 @@ const app = new Vue({
                         .then(response =>{
                             if (response.status==401) {
                                 alert("Error en las credenciales. No son correctas")
+                                return response.json()
                             }else if(response.status==200) {
                                 alert("Se a conectado exitosamente || " + "El usuario se llama: " + form.username.value )
                                 this.login= false
                                 app.user_active = true
+                                return response.json()
                             }
+                        })
+                        .then(json =>{
+                            console.log(json)
                         })
                         .catch(function (error) {
                             console.log(error)
