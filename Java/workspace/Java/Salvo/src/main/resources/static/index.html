@@ -20,6 +20,8 @@
               <li><button type="button" class="btn btn-primary"><a @click="actual_page = 'game_list_page'"> Games Index </a></button></li>
               <li><button type="button" class="btn btn-primary"><a @click="actual_page = 'login_page'">Log in // Log out</a></button></li>
               <li><button type="button" class="btn btn-primary"><a @click="actual_page = 'players_list_page'">Players Index</a></button></li>
+              <li><button v-show="user_active" type="button" class="btn btn-primary"><a @click="logOut">Log Out</a></button></li>
+              <li><button v-show="user_active" type="button" class="btn btn-primary"><a href="/grid.html">Go to the game</a></button></li>
           </ul>
       </nav>
     </div>
@@ -27,10 +29,14 @@
     <template>
        <game_list_page :games="list_games" v-if="list_games.length > 0 && actual_page == 'game_list_page'"> </game_list_page>
        
-       <login_page v-if="actual_page == 'login_page'"> </login_page>
+       <login_page v-if="actual_page == 'login_page'" :user_active="user_active"> </login_page>
        
        <player_boardscore_page v-if="actual_page == 'players_list_page'" :players="list_players"> </player_boardscore_page>
+
+       <logout_button v-if="user_active == true" :user_active="user_active"></logout_button>
     </template>
+
+    
 
 
     <div id="scripts">

@@ -4,6 +4,7 @@ const app = new Vue({
         actual_page: "game_list_page",
         list_players: [],
         list_games: [],
+        user_active: false
     },
     created: () => {
         //fetch al java
@@ -38,6 +39,19 @@ const app = new Vue({
                 console.log(error)
             })
         
+    },
+    methods:{
+        logOut: function(ev){
+            return fetch("/api/logout",{
+                method: "Post"
+            })
+            .then(response =>{
+                 if(response.status==200) {
+                    alert("Se a desconectado correctamente")
+                    this.user_active = false
+                    }
+                })
+            }
     },
     components: {
         game_list_page: {
@@ -143,11 +157,11 @@ const app = new Vue({
                         `
         },
         login_page: {
-            props: [],
+            props: ["user_active"],
             data: function(){
                 return {
                     login: true,
-                    logout: false
+                    register: false
                 }
             },
              methods: {
@@ -169,12 +183,10 @@ const app = new Vue({
                         .then(response =>{
                             if (response.status==401) {
                                 alert("Error en las credenciales. No son correctas")
-                                this.login= true
-                                this.logout= false
                             }else if(response.status==200) {
                                 alert("Se a conectado exitosamente || " + "El usuario se llama: " + form.username.value )
                                 this.login= false
-                                this.logout = true
+                                app.user_active = true
                             }
                         })
                         .catch(function (error) {
@@ -182,18 +194,37 @@ const app = new Vue({
                         })
                     }
                 },
-                logOut: function(ev){
-                    return fetch("/api/logout",{
-                        method: "Post"
-                    })
-                    .then(response =>{
-                         if(response.status==200) {
-                            alert("Se a desconectado correctamente")
-                            this.login= true
-                            this.logout = false
+                registration: function(ev){
+                    let form = ev.target
+                    let result = true
+                    if (form.username.value == "" || form.password.value == "" || form.email.value == "") {
+                        alert("flaco, llename TODOS los campos")
+                        return false
+                    }else{
+                        //fetch a LOGIN
+                        let formdata = new FormData();
+                        formdata.append("username", form.username.value)
+                        formdata.append("password", form.password.value)
+                        formdata.append("email", form.email.value)
+                        return fetch("/api/players",{
+                            method: "Post",
+                            body: formdata
+                        })
+                        .then(response =>{
+                            if (response.status==403) {
+                                alert("El nombre de usuario ya se encuentra en uso. Eliga otro")
+                            }else if(response.status==201) {
+                                alert("Se ha registrado exitosamente :) como: " + form.username.value )
+                                this.login= true
+                                this.register= false
                             }
                         })
+                        .catch(function (error) {
+                            console.log(error)
+                        })
                     }
+                }
+
             },
             template: `
                         <div>
@@ -204,7 +235,7 @@ const app = new Vue({
                                 </div>
                             </div>
 
-                            <div v-if="login" class="main">
+                            <div v-if="user_active == false && login == true" class="main">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="login-form">
                                         <form v-on:submit.prevent="log($event)">
@@ -216,23 +247,38 @@ const app = new Vue({
                                                 <label>Password</label>
                                                 <input type="password" class="form-control" placeholder="Password" name="password">
                                             </div>
-                                            <button v-show="login" type="submit" class="btn btn-black">Log in</button>
+                                            <button type="submit" class="btn btn-black">Log in</button>
+                                            <button v-show="user_active == false" v-on:click="register = true, login = false" type="button" class="btn btn-black">Register</button>
                                         </form>
                                     </div>
                                 </div>
                             </div>
 
-                            <div v-if="logout" class="main">
-                                <div class="col-md-6 col-sm-12">
-                                    <div class="login-form">
-                                        <form v-on:submit.prevent="logOut($event)">
-                                            <button v-show="logout" type="submit" class="btn btn-secondary">Log Out</button>
-                                        </form>
-                                    </div>
+                        <div v-if="register" class="main">
+                            <div class="col-md-6 col-sm-12">
+                                <div class="login-form">
+                                    <form v-on:submit.prevent="registration($event)">
+                                        <div class="form-group">
+                                            <label>User Name</label>
+                                            <input type="text" class="form-control" placeholder="User Name" name="username">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Password</label>
+                                            <input type="password" class="form-control" placeholder="Password" name="password">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>E-mail</label>
+                                            <input type="email" class="form-control" placeholder="Email" name="email">
+                                        </div>
+                                        <button type="submit" class="btn btn-secondary">Register</button>
+                                        <button v-on:click="login = true, register = false" type="button" class="btn btn-black">Log in</button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
+
+                    </div>
                     `
-                    },
+                    }
                 }
             })
