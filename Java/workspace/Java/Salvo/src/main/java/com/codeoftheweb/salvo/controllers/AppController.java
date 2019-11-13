@@ -25,12 +25,13 @@ public class AppController {
     private ShipRepository shipRepo;
 
     @Autowired
+    private GamePlayer gp;
+
+    @Autowired
     private PlayerRepository playerRepo;
 
     @Autowired
     private GameRepository gameRepo;
-
-    private Game game;
 
     @Autowired
     private GamePlayerRepository gamePlayerRepo;
@@ -58,7 +59,7 @@ public class AppController {
             return new ResponseEntity<>(map, HttpStatus.FORBIDDEN);
         }
 
-        if (playerRepo.findByUsername(username) != null) {
+        if (playerRepo.findByUsername(username) == null) {
             map.put("error", "el usuario que elegiste ya existe, probaste apagando y volviendo a encender?");
             return new ResponseEntity<>(map, HttpStatus.FORBIDDEN);
         }
@@ -71,28 +72,27 @@ public class AppController {
 
     //POST PARA CREAR JUEGOS
     @RequestMapping(value = "/games", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> createGame(
-            @RequestParam String userName) {
+    public ResponseEntity<Map<String, Object>> createGame(Authentication authentication) {
 
-        Map<String, Object> map = new HashMap<>();
+        System.out.println(authentication.getAuthorities() + "get Authorities");
+        System.out.println(authentication.getCredentials() + "get Credentials");
+        System.out.println(authentication.getDetails() + "get details");
+        System.out.println(authentication.getPrincipal() + "get principal");
+        System.out.println(authentication.getName() + "get name");
+        System.out.println(authentication.getClass() + "get class");
+        Map<String, Object> dto = new HashMap<>();
 
-        if (userName.isEmpty()) {
-            map.put("error", "te haces el pistola tocandome el back?");
-            return new ResponseEntity<>(map, HttpStatus.FORBIDDEN);
+        if (isGuest(authentication)) {
+            dto.put("Error", "Guest cannot create games");
+            return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
         }
 
-        if (playerRepo.findByUsername(userName) != null) {
-            map.put("error", "el usuario que entro no existe, terrible bug, probaste apagando y volviendo a encender?");
-            return new ResponseEntity<>(map, HttpStatus.FORBIDDEN);
-        }
-
-
+        Player player = playerRepo.findByUsername(authentication.getName());
         Game game = gameRepo.save(new Game(LocalDateTime.now()));
-        map.put("Exito", "El juego ha sido creado");
-        return new ResponseEntity<>(map,HttpStatus.CREATED);
 
-        //gamePlayerRepo.save(new GamePlayer())
-        //return new ResponseEntity<>(HttpStatus.CREATED);
+        gp = gamePlayerRepo.save(new GamePlayer(player,game,game.getCreationTime(),true));
+        dto.put("Exito", "El juego y la relacion ha sido creado");
+        return new ResponseEntity<>(dto,HttpStatus.CREATED);
     }
 
     //GET PIDE JUEGOS, TAMBIEN INDICA QUIEN ESTA CONECTADO

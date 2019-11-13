@@ -21,11 +21,6 @@ public class SalvoApplication {
         SpringApplication.run(SalvoApplication.class);
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
-
     @Autowired
     PasswordEncoder encoder;
 
