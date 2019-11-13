@@ -3,6 +3,7 @@ package com.codeoftheweb.salvo.model;
 import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -13,7 +14,7 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
     private long id;
-    private String gameName;
+    private LocalDateTime creationTime;
 
     @OneToMany(mappedBy="game", fetch=FetchType.EAGER, cascade= CascadeType.ALL)
     private Set<GamePlayer> gamePlayers = new HashSet<>();
@@ -23,22 +24,22 @@ public class Game {
 
     public Game() { }
 
-    public Game(String gameName) {
+    public Game(LocalDateTime creationTime) {
 
-        this.gameName = gameName;
+        this.creationTime = creationTime;
     }
 
     public Map<String, Object> gameDTO(){
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("game_id",this.id);
-        dto.put("game_name", this.getGameName());
+        dto.put("creation_date", this.convertToNormalTime(getCreationTime()));
         return dto;
     }
 
     public Map<String, Object> gameWithPlayersDTO(){
         Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("game_id",this.id);
-        dto.put("game_name", this.getGameName());
+        dto.put("creation_date", this.convertToNormalTime(getCreationTime()));
         dto.put("game_players", this.getGamePlayers().stream().map(GamePlayer::playerDTO));
         return dto;
     }
@@ -67,8 +68,21 @@ public class Game {
         return gamePlayers;
     }
 
-    public String getGameName() {
-        return gameName;
+    public LocalDateTime getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCreationTime(LocalDateTime creationTime) {
+        this.creationTime = creationTime;
+    }
+
+    public String convertToNormalTime (LocalDateTime joinTime){
+
+        DateTimeFormatter formateador = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+
+        String formatDateTime = joinTime.format(formateador);
+
+        return formatDateTime;
     }
 }
 

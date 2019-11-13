@@ -7,5 +7,4 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 @RepositoryRestResource
 public interface GameRepository extends JpaRepository<Game, Long> {
-    Game findByGameName(@Param("gameName") String gameName);
 }

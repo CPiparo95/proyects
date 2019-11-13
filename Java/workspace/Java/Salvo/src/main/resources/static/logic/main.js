@@ -65,7 +65,6 @@ const app = new Vue({
                                     <thead class="thead-dark">
                                         <tr>
                                             <th scope="col">Game ID</th>
-                                            <th scope="col">Game Name</th>
                                             <th scope="col">Creation Date</th>
                                             <th scope="col">User Creator</th>
                                             <th scope="col">User Guest</th>
@@ -75,8 +74,7 @@ const app = new Vue({
                                     <tbody>
                                         <tr v-for="game in games">
                                             <th scope="row">{{game.game_id}}</th>
-                                            <td>{{game.game_name}}</td>
-                                            <td v-for="gp in game.game_players" v-if="gp.is_host"> {{gp.join_time}} </td>
+                                            <td >{{game.creation_date}}</td>
                                             <td v-for="gp in game.game_players" v-if="gp.is_host"> {{gp.player.user_name}} </td>
                                             <td v-for="gp in game.game_players" v-if="gp.is_host == false"> {{gp.player.user_name}} </td>
                                             <td v-for="gp in game.game_players" v-if="gp.is_host == false"> {{gp.join_time}} </td>

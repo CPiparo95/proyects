@@ -35,7 +35,7 @@ public class Player {
         dto.put("player_id",this.id);
         dto.put("email",this.getEmail());
         dto.put("user_name", this.getUserName());
-        dto.put("game_player", this.getGamePlayers().stream().map(GamePlayer::gameDTO));
+        dto.put("game_players", this.getGamePlayers().stream().map(GamePlayer::gameDTO));
         return dto;
     }
 

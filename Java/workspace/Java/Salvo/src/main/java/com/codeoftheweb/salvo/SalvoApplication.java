@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import com.codeoftheweb.salvo.repositorys.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,11 @@ public class SalvoApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(SalvoApplication.class);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
     }
 
     @Autowired
@@ -40,10 +46,10 @@ public class SalvoApplication {
             Player player5 = playerRepository.save(new Player("Rojelio", encoder.encode("soyUnapassword"),"PeroOsvaldoEraUnIrrespetuoso@gmail.com"));
             Player player6 = playerRepository.save(new Player("Claudio", encoder.encode("Rola"),"Claudiodpiparo@gmail.com"));
 
-            Game juego01 = gameRepository.save(new Game("Juego nuevo01"));
-            Game juego02 = gameRepository.save(new Game("Juevo nuevo02"));
-            Game juego03 = gameRepository.save(new Game("Juevo nuevo03"));
-            Game juego04 = gameRepository.save(new Game("Juevo nuevo04"));
+            Game juego01 = gameRepository.save(new Game(LocalDateTime.now()));
+            Game juego02 = gameRepository.save(new Game(LocalDateTime.now()));
+            Game juego03 = gameRepository.save(new Game(LocalDateTime.now()));
+            Game juego04 = gameRepository.save(new Game(LocalDateTime.now()));
 
             Set<Positions> barco1 = new HashSet<>();
             Set<Positions> barco2 = new HashSet<>();
@@ -103,13 +109,13 @@ public class SalvoApplication {
             Ship nave09 = shipRepository.save(new Ship(ShipType.gaucho4,barco9));
             Ship nave10 = shipRepository.save(new Ship(ShipType.gaucho5,barco10));
 
-            GamePlayer relacion1 = gamePlayerRepository.save(new GamePlayer(player1, juego01, LocalDateTime.now(), true));
+            GamePlayer relacion1 = gamePlayerRepository.save(new GamePlayer(player1, juego01, juego01.getCreationTime(), true));
             GamePlayer relacion2 = gamePlayerRepository.save(new GamePlayer(player2, juego01, LocalDateTime.now(), false));
-            GamePlayer relacion3 = gamePlayerRepository.save(new GamePlayer(player1, juego02, LocalDateTime.now(), true));
+            GamePlayer relacion3 = gamePlayerRepository.save(new GamePlayer(player1, juego02, juego02.getCreationTime(), true));
             GamePlayer relacion4 = gamePlayerRepository.save(new GamePlayer(player3, juego02, LocalDateTime.now(), false));
-            GamePlayer relacion5 = gamePlayerRepository.save(new GamePlayer(player4, juego03, LocalDateTime.now(), true));
+            GamePlayer relacion5 = gamePlayerRepository.save(new GamePlayer(player4, juego03, juego03.getCreationTime(), true));
             GamePlayer relacion6 = gamePlayerRepository.save(new GamePlayer(player5, juego03, LocalDateTime.now(), false));
-            GamePlayer relacion7 = gamePlayerRepository.save(new GamePlayer(player2, juego04, LocalDateTime.now(), true));
+            GamePlayer relacion7 = gamePlayerRepository.save(new GamePlayer(player2, juego04, juego04.getCreationTime(), true));
             GamePlayer relacion8 = gamePlayerRepository.save(new GamePlayer(player3, juego04, LocalDateTime.now(), false));
 
             Score score1 = scoreRepository.save(new Score(player3, juego04, LocalDateTime.now(), 1.0));

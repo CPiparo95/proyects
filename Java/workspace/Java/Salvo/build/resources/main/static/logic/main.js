@@ -65,7 +65,6 @@ const app = new Vue({
                                     <thead class="thead-dark">
                                         <tr>
                                             <th scope="col">Game ID</th>
-                                            <th scope="col">Game Name</th>
                                             <th scope="col">Creation Date</th>
                                             <th scope="col">User Creator</th>
                                             <th scope="col">User Guest</th>
@@ -75,8 +74,7 @@ const app = new Vue({
                                     <tbody>
                                         <tr v-for="game in games">
                                             <th scope="row">{{game.game_id}}</th>
-                                            <td>{{game.game_name}}</td>
-                                            <td v-for="gp in game.game_players" v-if="gp.is_host"> {{gp.join_time}} </td>
+                                            <td >{{game.creation_date}}</td>
                                             <td v-for="gp in game.game_players" v-if="gp.is_host"> {{gp.player.user_name}} </td>
                                             <td v-for="gp in game.game_players" v-if="gp.is_host == false"> {{gp.player.user_name}} </td>
                                             <td v-for="gp in game.game_players" v-if="gp.is_host == false"> {{gp.join_time}} </td>
@@ -181,18 +179,14 @@ const app = new Vue({
                             body: formdata
                         })
                         .then(response =>{
+                            //NO RESOLVER LA RESPUESTA, LOGUEO MANEJADO POR SPRING, NO ES POSIBLE MANEJAR EL JSON
                             if (response.status==401) {
                                 alert("Error en las credenciales. No son correctas")
-                                return response.json()
                             }else if(response.status==200) {
                                 alert("Se a conectado exitosamente || " + "El usuario se llama: " + form.username.value )
                                 this.login= false
                                 app.user_active = true
-                                return response.json()
                             }
-                        })
-                        .then(json =>{
-                            console.log(json)
                         })
                         .catch(function (error) {
                             console.log(error)
@@ -217,12 +211,15 @@ const app = new Vue({
                         })
                         .then(response =>{
                             if (response.status==403) {
-                                alert("El nombre de usuario ya se encuentra en uso. Eliga otro")
+                                return response.json()
                             }else if(response.status==201) {
-                                alert("Se ha registrado exitosamente :) como: " + form.username.value )
                                 this.login= true
                                 this.register= false
+                                return response.json()
                             }
+                        })
+                        .then(json =>{
+                            alert(json)
                         })
                         .catch(function (error) {
                             console.log(error)
