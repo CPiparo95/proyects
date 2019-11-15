@@ -4,10 +4,12 @@ const app = new Vue({
         actual_page: "game_list_page",
         list_players: [],
         list_games: [],
-        user_active: false
+        user_active: false,
+        user_information: {},
+        creation_game: false
     },
-    created: () => {
-        //fetch al java
+    mounted: () => {
+        //fetch a games
         fetch("/api/games")
             .then(function (response) {
                 if (response.ok) {
@@ -23,6 +25,7 @@ const app = new Vue({
             .catch(function (error) {
                 console.log(error)
             })
+            //fetch a players
             fetch("/api/players")
             .then(function (response) {
                 if (response.ok) {
@@ -38,7 +41,21 @@ const app = new Vue({
             .catch(function (error) {
                 console.log(error)
             })
-        
+            //fetch a user conectado
+            fetch("/api/connected")
+            .then(res => {
+                    return res.json()
+            })
+            .then(json => {
+                app.user_information = json
+                if (json.player != "guest"){
+                    app.user_active = true
+                }
+                return json
+            })
+            .catch(function (Error) {
+                console.log(Error)
+            })   
     },
     methods:{
         logOut: function(ev){
@@ -51,16 +68,73 @@ const app = new Vue({
                     this.user_active = false
                     }
                 })
-            }
+            },
+        compruebaUser: function(){
+            //fetch a connected (indica el usuario conectado)
+            fetch("/api/connected")
+            .then(res => {
+                    return res.json()
+            })
+            .then(json => {
+                app.user_information = json
+                if (json.player != "guest"){
+                    app.user_active = true
+                }
+                return json
+            })
+            .catch(function (Error) {
+                console.log(Error)
+            })
+        },
     },
     components: {
         game_list_page: {
+            methods:{
+                registerGame: function(ev){
+                    return fetch("/api/games",{
+                        method: "Post"
+                    })
+                    .then(res =>{
+                            return res.json()
+                        })
+                    .then(json =>{
+                        alert(JSON.stringify(json))
+                        window.location.reload(true);
+                    })
+                    
+                },
+                joinGame: function(ev, gameId){
+                    let url = "/api/joinGame/"
+                    url += gameId
+                    console.log(url)
+                    return fetch(url,{
+                        method: "Post"
+                    })
+                    .then(res =>{
+                            return res.json()
+                        })
+                    .then(json =>{
+                        alert(JSON.stringify(json))
+                        window.location.reload(true);
+                    })
+                }
+            },
             props: ['games'],
+            //PREGUNTAR A RODRI COMO HACER CON V-ELSE PARA MOSTRAR LA INFO A PESAR DE HABER 1 SOLO GP
+            //ERROR AL INTENTAR CONVERTIR STRING A LONG, GAMEID SACADO DIRECTO DEL JSON
+            //ERROR CON app.user_information.player.user_name
             template: `
+            {{app.compruebaUser}}
                         <div>
                             <div class="text-center">
                                 <img id="imagenFondo" src="images/playstation.jpg" class="rounded">
-
+                                <div>
+                                    <nav style="border: 2px solid black; position: relative; z-index: 10; ">
+                                        <ul style="list-style-type: none; display: flex; justify-content: space-around;">
+                                            <li><button v-show="app.user_active" type="button" class="btn btn-primary"><a @click="registerGame">Create Game</a></button></li>
+                                        </ul>
+                                    </nav>
+                                    </div>
                                 <table class="table">
                                     <thead class="thead-dark">
                                         <tr>
@@ -69,6 +143,7 @@ const app = new Vue({
                                             <th scope="col">User Creator</th>
                                             <th scope="col">User Guest</th>
                                             <th scope="col">Join Time</th>
+                                            <th scope="col">Join Game</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -78,10 +153,17 @@ const app = new Vue({
                                             <td v-for="gp in game.game_players" v-if="gp.is_host"> {{gp.player.user_name}} </td>
                                             <td v-for="gp in game.game_players" v-if="gp.is_host == false"> {{gp.player.user_name}} </td>
                                             <td v-for="gp in game.game_players" v-if="gp.is_host == false"> {{gp.join_time}} </td>
+
+                                            <td v-for="gp in game.game_players" v-show="app.user_active == true && game.game_players.length == 1" >
+                                                <button type="button" class="btn btn-primary"
+                                                v-if="gp.player.user_name != app.user_information.player.user_name">
+                                                    <a @click="joinGame(game.game_id)"> Join Game </a>
+                                                </button>
+                                            </td>
+
                                         </tr>
                                     </tbody>
                                 </table>
-
                             </div>
                         </div>
                         `
@@ -195,7 +277,6 @@ const app = new Vue({
                 },
                 registration: function(ev){
                     let form = ev.target
-                    let result = true
                     if (form.username.value == "" || form.password.value == "" || form.email.value == "") {
                         alert("flaco, llename TODOS los campos")
                         return false
@@ -210,16 +291,16 @@ const app = new Vue({
                             body: formdata
                         })
                         .then(response =>{
-                            if (response.status==403) {
+                            if (response.status==403) { //ERROR, FORBIDDEN
                                 return response.json()
-                            }else if(response.status==201) {
+                            }else if(response.status==201) { //SUCCESS, Registrado
                                 this.login= true
                                 this.register= false
                                 return response.json()
                             }
                         })
                         .then(json =>{
-                            alert(json)
+                            alert(JSON.stringify(json))
                         })
                         .catch(function (error) {
                             console.log(error)

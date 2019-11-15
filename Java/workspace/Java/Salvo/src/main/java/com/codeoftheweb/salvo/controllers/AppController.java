@@ -24,7 +24,6 @@ public class AppController {
     @Autowired
     private ShipRepository shipRepo;
 
-    @Autowired
     private GamePlayer gp;
 
     @Autowired
@@ -38,12 +37,6 @@ public class AppController {
 
     @Autowired
     private SalvoesRepository salvoesRepo;
-
-    //GET PIDE PLAYERS
-    @RequestMapping("/players")
-    public List<Map<String, Object>> getPlayers() {
-        return playerRepo.findAll().stream().map(Player::playerWithGamesDTO).collect(Collectors.toList());
-    }
 
     //POST PARA CREAR PLAYERS
     @RequestMapping(value = "/players", method = RequestMethod.POST)
@@ -59,15 +52,45 @@ public class AppController {
             return new ResponseEntity<>(map, HttpStatus.FORBIDDEN);
         }
 
-        if (playerRepo.findByUsername(username) == null) {
+        if (playerRepo.findByUsername(username) != null) {
             map.put("error", "el usuario que elegiste ya existe, probaste apagando y volviendo a encender?");
             return new ResponseEntity<>(map, HttpStatus.FORBIDDEN);
         }
 
         playerRepo.save(new Player(username, encoder.encode(password), email));
-        map.put("error", "mensaje de prueba, soy un user creado");
+        map.put("Success!", "has creado al usuario, pero aun no esta logueado");
         return new ResponseEntity<>(map, HttpStatus.CREATED);
 
+    }
+
+    //POST PARA UNIRSE A JUEGOS
+
+    @RequestMapping(value = "/joinGame/{gameId}", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> joinGame(Authentication authentication, @PathVariable Long gameId) {
+        Map<String, Object> dto = new HashMap<>();
+        if(isGuest(authentication)) {
+            dto.put("ERROR", "No se puede loguear si estas desconectado, por favor conectate");
+            return new ResponseEntity<>(dto,HttpStatus.UNAUTHORIZED);
+        }
+
+        Game game = gameRepo.findById(gameId).orElse(null);
+        if(game == null){
+            dto.put("ERROR", "No se puede conectar a un juego inexistente");
+            return new ResponseEntity<>(dto,HttpStatus.NOT_FOUND);
+        }else if (game.getGamePlayers().size() > 1){
+            dto.put("ERROR", "La sala esta llena");
+            return new ResponseEntity<>(dto,HttpStatus.FORBIDDEN);
+        }else{
+            Player player = playerRepo.findByUsername(authentication.getName());
+            if (game.getGamePlayers().stream().anyMatch(gp -> gp.getPlayer().getId() == player.getId())){
+                dto.put("ERROR", "No podes jugar contra vos mismo...");
+                return new ResponseEntity<>(dto,HttpStatus.FORBIDDEN);
+            }else{
+                GamePlayer newgp = new GamePlayer(player,game,LocalDateTime.now(),false);
+                dto.put("Success", "Te has unido al juego correctamente");
+                return new ResponseEntity<>(dto,HttpStatus.CREATED);
+            }
+        }
     }
 
     //POST PARA CREAR JUEGOS
@@ -91,21 +114,33 @@ public class AppController {
         Game game = gameRepo.save(new Game(LocalDateTime.now()));
 
         gp = gamePlayerRepo.save(new GamePlayer(player,game,game.getCreationTime(),true));
-        dto.put("Exito", "El juego y la relacion ha sido creado");
+        dto.put(" Success ", " El juego ha sido creado, y usted se ha unido a el");
         return new ResponseEntity<>(dto,HttpStatus.CREATED);
     }
 
     //GET PIDE JUEGOS, TAMBIEN INDICA QUIEN ESTA CONECTADO
     @RequestMapping("/games")
-    public Map<String, Object> getGames(Authentication authentication) {
+    public Map<String, Object> getGames() {
+        Map<String, Object> dto = new LinkedHashMap<>();
+        dto.put("games", gameRepo.findAll().stream().map(Game::gameWithPlayersDTO).collect(Collectors.toList()));
+        return dto;
+    }
+
+    //GET PIDE PLAYERS
+    @RequestMapping("/players")
+    public List<Map<String, Object>> getPlayers() {
+        return playerRepo.findAll().stream().map(Player::playerWithGamesDTO).collect(Collectors.toList());
+    }
+
+    //GET DONDE INDICA QUIEN ESTA CONECTADO
+    @RequestMapping("/connected")
+    public Map<String, Object> getUserConnected(Authentication authentication) {
         Map<String, Object> dto = new LinkedHashMap<>();
 
         if (isGuest(authentication))
             dto.put("player", "guest");
         else
             dto.put("player", playerRepo.findByUsername(authentication.getName()).playerDTO());
-
-        dto.put("games", gameRepo.findAll().stream().map(Game::gameWithPlayersDTO).collect(Collectors.toList()));
         return dto;
     }
 
@@ -113,6 +148,41 @@ public class AppController {
     @RequestMapping("/game_view/{gamePlayerID}")
     public Map<String, Object> getGameView(@PathVariable long gamePlayerID){
         return this.gameViewDTO(gamePlayerRepo.findById(gamePlayerID).orElse(null));
+    }
+
+    //GET QUE INDICA UN JUEGO EN PARTICULAR
+    /* @RequestMapping("/game_view/{gamePlayerID}")
+    public ResponseEntity<Map<String, Object>> getGameView(@PathVariable long gamePlayerID, Authentication auth){
+
+        ResponseEntity<Map<String, Object>> response;
+        Map<String, Object> dto = new HashMap<>();
+        //NO ENTIENDO PORQUE DA ERROR ACA, SIMPLEMENTE NO ME LO EXPLICO
+        GamePlayer gp = gamePlayerRepo.findById(gamePlayerID);
+
+        if (auth.getName() != gp.getPlayer().getUserName()) {
+            dto.put("Error", "cheat is not allowed!");
+            return response = new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
+        }
+
+        dto.put("data",this.gameViewDTO(gamePlayerRepo.findById(gamePlayerID).orElse(null)));
+        return response = new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
+    }
+*/
+    //GET QUE INDICA LOS JUEGOS DE UN JUGADOR EN PARTICULAR
+    @RequestMapping("/players/{playerID}")
+    public Map<String, Object> getPlayerView(@PathVariable long playerID){
+        return this.playerViewDTO(playerRepo.findById(playerID).orElse(null));
+    }
+
+    //DTO
+    private Map<String, Object> playerViewDTO (Player player){
+        Map<String, Object> dto = new LinkedHashMap<>();
+        if (player != null) {
+            dto = player.playerWithGamesDTO();
+        }else
+        { dto.put("ERROR", "no such player"); }
+
+        return dto;
     }
 
     //DTO
@@ -129,8 +199,7 @@ public class AppController {
             return dto;
     }
 
-
-
+    //Authentication Method
     private boolean isGuest(Authentication authentication) {
         return authentication == null || authentication instanceof AnonymousAuthenticationToken;
     }
