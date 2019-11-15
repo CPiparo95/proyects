@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <link rel="stylesheet" type="text/css" href="styles/style.css" />
+  <link rel="stylesheet" type="text/css" href="styles/styleIndex.css" />
   <link href="https://fonts.googleapis.com/css?family=Lora&display=swap" rel="stylesheet">
 </head>
 
@@ -21,17 +21,16 @@
               <li><button type="button" class="btn btn-primary"><a @click="actual_page = 'login_page'">Log in // Log out</a></button></li>
               <li><button type="button" class="btn btn-primary"><a @click="actual_page = 'players_list_page'">Players Index</a></button></li>
               <li><button v-show="user_active" type="button" class="btn btn-primary"><a @click="logOut">Log Out</a></button></li>
-              <li><button v-show="user_active" type="button" class="btn btn-primary"><a href="/grid.html">Go to the game</a></button></li>
           </ul>
       </nav>
     </div>
 
     <template>
-       <game_list_page :games="list_games" v-if="list_games.length > 0 && actual_page == 'game_list_page'"> </game_list_page>
+       <game_list_page :games="list_games" :userdata="user_information" v-if="list_games.length > 0 && actual_page == 'game_list_page'"> </game_list_page>
        
        <login_page v-if="actual_page == 'login_page'" :user_active="user_active"> </login_page>
        
-       <player_boardscore_page v-if="actual_page == 'players_list_page'" :players="list_players"> </player_boardscore_page>
+       <player_boardscore_page v-if="list_players.length > 0 && actual_page == 'players_list_page'" :players="list_players"> </player_boardscore_page>
 
        <logout_button v-if="user_active == true" :user_active="user_active"></logout_button>
     </template>

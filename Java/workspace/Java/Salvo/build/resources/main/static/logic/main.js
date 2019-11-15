@@ -103,12 +103,12 @@ const app = new Vue({
                     })
                     
                 },
-                joinGame: function(ev, gameId){
-                    let formdata = new FormData();
-                    formdata.append("gameId", gameId)
-                    return fetch("/api/joinGame",{
-                        method: "Post",
-                        body : formdata
+                joinGame: function(gameId){
+                    let url = "/api/joinGame/"
+                    url += gameId
+                    console.log(url)
+                    return fetch(url,{
+                        method: "Post"
                     })
                     .then(res =>{
                             return res.json()
@@ -117,10 +117,15 @@ const app = new Vue({
                         alert(JSON.stringify(json))
                         window.location.reload(true);
                     })
+                },
+                goToGame: function(gpId){
+                    let url = "/grid.html?gp=" + gpId + "&ships=1"
+
                 }
             },
-            props: ['games'],
+            props: ['games','userdata'],
             //PREGUNTAR A RODRI COMO HACER CON V-ELSE PARA MOSTRAR LA INFO A PESAR DE HABER 1 SOLO GP
+            //ERROR CON app.user_information.player.user_name
             template: `
             {{app.compruebaUser}}
                         <div>
@@ -142,6 +147,7 @@ const app = new Vue({
                                             <th scope="col">User Guest</th>
                                             <th scope="col">Join Time</th>
                                             <th scope="col">Join Game</th>
+                                            <th scope="col">Go to the game</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -154,11 +160,18 @@ const app = new Vue({
 
                                             <td v-for="gp in game.game_players" v-show="app.user_active == true && game.game_players.length == 1" >
                                                 <button type="button" class="btn btn-primary"
-                                                v-if="gp.player.user_name != app.user_information.player.user_name">
+                                                v-if="gp.player.user_name != userdata.player.user_name">
                                                     <a @click="joinGame(game.game_id)"> Join Game </a>
                                                 </button>
                                             </td>
 
+                                            <td v-for="gp in game.game_players" v-show="app.user_active == true" >
+                                                <button type="button" class="btn btn-primary"
+                                                v-if="gp.player.user_name == userdata.player.user_name">
+                                                    <a :href="'/grid.html?gp='+gp.game_player_id+'&ships=1'"> Go to the game </a>
+                                                </button>
+                                            </td>
+                                            
                                         </tr>
                                     </tbody>
                                 </table>
@@ -187,7 +200,7 @@ const app = new Vue({
                         obj.lost = 0
                         obj.tied = 0
 
-                        player.game_player.forEach(gp =>{
+                        player.game_players.forEach(gp =>{
                             if (gp.score == 0.0){
                                 obj.lost ++
                             }else if (gp.score == 0.5){

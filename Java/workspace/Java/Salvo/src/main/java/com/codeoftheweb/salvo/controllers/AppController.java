@@ -87,6 +87,7 @@ public class AppController {
                 return new ResponseEntity<>(dto,HttpStatus.FORBIDDEN);
             }else{
                 GamePlayer newgp = new GamePlayer(player,game,LocalDateTime.now(),false);
+                gamePlayerRepo.save(newgp);
                 dto.put("Success", "Te has unido al juego correctamente");
                 return new ResponseEntity<>(dto,HttpStatus.CREATED);
             }
@@ -97,12 +98,6 @@ public class AppController {
     @RequestMapping(value = "/games", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> createGame(Authentication authentication) {
 
-        System.out.println(authentication.getAuthorities() + "get Authorities");
-        System.out.println(authentication.getCredentials() + "get Credentials");
-        System.out.println(authentication.getDetails() + "get details");
-        System.out.println(authentication.getPrincipal() + "get principal");
-        System.out.println(authentication.getName() + "get name");
-        System.out.println(authentication.getClass() + "get class");
         Map<String, Object> dto = new HashMap<>();
 
         if (isGuest(authentication)) {
@@ -115,6 +110,7 @@ public class AppController {
 
         gp = gamePlayerRepo.save(new GamePlayer(player,game,game.getCreationTime(),true));
         dto.put(" Success ", " El juego ha sido creado, y usted se ha unido a el");
+        dto.put("gamePlayerID", gp.getId());
         return new ResponseEntity<>(dto,HttpStatus.CREATED);
     }
 
@@ -145,19 +141,12 @@ public class AppController {
     }
 
     //GET QUE INDICA UN JUEGO EN PARTICULAR
-    @RequestMapping("/game_view/{gamePlayerID}")
-    public Map<String, Object> getGameView(@PathVariable long gamePlayerID){
-        return this.gameViewDTO(gamePlayerRepo.findById(gamePlayerID).orElse(null));
-    }
-
-    //GET QUE INDICA UN JUEGO EN PARTICULAR
-    /* @RequestMapping("/game_view/{gamePlayerID}")
+     @RequestMapping("/game_view/{gamePlayerID}")
     public ResponseEntity<Map<String, Object>> getGameView(@PathVariable long gamePlayerID, Authentication auth){
 
         ResponseEntity<Map<String, Object>> response;
         Map<String, Object> dto = new HashMap<>();
-        //NO ENTIENDO PORQUE DA ERROR ACA, SIMPLEMENTE NO ME LO EXPLICO
-        GamePlayer gp = gamePlayerRepo.findById(gamePlayerID);
+        GamePlayer gp = gamePlayerRepo.findById(gamePlayerID).orElse(null);
 
         if (auth.getName() != gp.getPlayer().getUserName()) {
             dto.put("Error", "cheat is not allowed!");
@@ -165,9 +154,9 @@ public class AppController {
         }
 
         dto.put("data",this.gameViewDTO(gamePlayerRepo.findById(gamePlayerID).orElse(null)));
-        return response = new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
+        return response = new ResponseEntity<>(dto, HttpStatus.OK);
     }
-*/
+
     //GET QUE INDICA LOS JUEGOS DE UN JUGADOR EN PARTICULAR
     @RequestMapping("/players/{playerID}")
     public Map<String, Object> getPlayerView(@PathVariable long playerID){
@@ -190,8 +179,8 @@ public class AppController {
         Map<String, Object> dto = new LinkedHashMap<>();
         if (gamePlayer != null) {
             dto = gamePlayer.getGame().gameWithPlayersDTO();
-            dto.put("Ships", gamePlayer.getShip().stream().map(Ship::shipDTO));
-            dto.put("Salvoes", gamePlayer.getGame().getGamePlayers().stream().flatMap(gp -> gp.getSalvoes().stream()
+            dto.put("ships", gamePlayer.getShip().stream().map(Ship::shipDTO));
+            dto.put("salvoes", gamePlayer.getGame().getGamePlayers().stream().flatMap(gp -> gp.getSalvoes().stream()
                     .map(Salvoes::salvoesDTO)));
         }else
         { dto.put("ERROR", "no such game"); }
