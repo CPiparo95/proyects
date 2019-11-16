@@ -26,6 +26,10 @@ public class AppController {
 
     private GamePlayer gp;
 
+    private Positions position;
+
+    private Ship ship;
+
     @Autowired
     private PlayerRepository playerRepo;
 
@@ -112,6 +116,19 @@ public class AppController {
         dto.put(" Success ", " El juego ha sido creado, y usted se ha unido a el");
         dto.put("gamePlayerID", gp.getId());
         return new ResponseEntity<>(dto,HttpStatus.CREATED);
+    }
+
+    @RequestMapping(value = "/placeShips/{gpId}", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> saveShipPositions(Authentication authentication) {
+
+        Map<String, Object> dto = new HashMap<>();
+
+        if (isGuest(authentication)) {
+            dto.put("Error", "Guest's cannot play games or place ships");
+            return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
+        }
+        Set<Positions> positions = new HashSet<>();
+
     }
 
     //GET PIDE JUEGOS, TAMBIEN INDICA QUIEN ESTA CONECTADO
