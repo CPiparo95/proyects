@@ -99,7 +99,8 @@ const app = new Vue({
                         })
                     .then(json =>{
                         alert(JSON.stringify(json))
-                        window.location.reload(true);
+                        //window.location.reload(true);
+                        this.goToGame(json.gamePlayerID)
                     })
                     
                 },
@@ -120,7 +121,7 @@ const app = new Vue({
                 },
                 goToGame: function(gpId){
                     let url = "/grid.html?gp=" + gpId + "&ships=1"
-
+                    window.location=(url)
                 }
             },
             props: ['games','userdata'],
@@ -168,10 +169,10 @@ const app = new Vue({
                                             <td v-for="gp in game.game_players" v-show="app.user_active == true" >
                                                 <button type="button" class="btn btn-primary"
                                                 v-if="gp.player.user_name == userdata.player.user_name">
-                                                    <a :href="'/grid.html?gp='+gp.game_player_id+'&ships=1'"> Go to the game </a>
+                                                    <a @click="goToGame(gp.game_player_id)"> Go to the game </a>
                                                 </button>
                                             </td>
-                                            
+
                                         </tr>
                                     </tbody>
                                 </table>

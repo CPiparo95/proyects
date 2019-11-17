@@ -1,6 +1,7 @@
 package com.codeoftheweb.salvo.controllers;
 import com.codeoftheweb.salvo.model.*;
 import com.codeoftheweb.salvo.repositorys.*;
+import com.sun.java.swing.plaf.windows.WindowsTextAreaUI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,8 @@ public class AppController {
     private ShipRepository shipRepo;
 
     private GamePlayer gp;
+
+    private Set<Positions> positions;
 
     private Positions position;
 
@@ -119,16 +122,50 @@ public class AppController {
     }
 
     @RequestMapping(value = "/placeShips/{gpId}", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> saveShipPositions(Authentication authentication) {
+    public ResponseEntity<Map<String, Object>> addShips(Authentication authentication,
+                                                                 @PathVariable Long gpId,
+                                                                 @RequestBody Set<Ship> ships) {
 
         Map<String, Object> dto = new HashMap<>();
 
         if (isGuest(authentication)) {
             dto.put("Error", "Guest's cannot play games or place ships");
             return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
-        }
-        Set<Positions> positions = new HashSet<>();
+        }else{
+            GamePlayer gp = gamePlayerRepo.findById(gpId).orElse(null);
+            Player player = playerRepo.findByUsername(authentication.getName());
+            if (gp == null){
+                dto.put("Error", "This game does not exist!");
+                return new ResponseEntity<>(dto, HttpStatus.NOT_FOUND);
+            }else if(gp.getPlayer().getId() != player.getId()){
+                dto.put("Error", "You are not playing this game!");
+                return new ResponseEntity<>(dto, HttpStatus.UNAUTHORIZED);
+            }else if(gp.getShip().size()>0){
+                dto.put("Error", "there are already ships positioned");
+                return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
+            }else if(ships== null || ships.size() != 5){
+                dto.put("Error", "There is not enough ships or you placed yoo much ships! (You have to add 5 ships)");
+                return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
+            }else{
+                if(ships.stream().anyMatch(ship -> this.isOutOfRange(ship))){
+                    dto.put("Error", "You have ships out of range");
+                    return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
+                }else if (ships.stream().anyMatch(ship -> this.isNotConsecutive(ship))){
+                    dto.put("Error", "Your ships are not consecutive!");
+                    return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
+                }else if (this.areOverlapped(ships)){
+                    dto.put("Error", "Your ships are overlapped!");
+                    return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
+                }else {
+                    ships.forEach(ship -> gp.addShip(ship));
 
+                    gamePlayerRepo.save(gp);
+
+                    dto.put("Success", "Ships have been added");
+                    return new ResponseEntity<>(dto, HttpStatus.CREATED);
+                }
+            }
+        }
     }
 
     //GET PIDE JUEGOS, TAMBIEN INDICA QUIEN ESTA CONECTADO
@@ -209,4 +246,77 @@ public class AppController {
     private boolean isGuest(Authentication authentication) {
         return authentication == null || authentication instanceof AnonymousAuthenticationToken;
     }
+
+    //Metodos especificos para las funciones
+    private boolean isOutOfRange(Ship ship){
+        for (String cell : ship.getLocations()){
+            if(!(cell instanceof String) || cell.length() < 2){
+                return true;
+            }
+            char y = cell.substring(0,1).charAt(0);
+            Integer x;
+            try{
+                x = Integer.parseInt(cell.substring(1));
+            }catch (NumberFormatException e){
+                x=99;
+            };
+
+            if (x < 1 || x > 10 || y < 'A' || y > 'J'){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isNotConsecutive(Ship ship){
+        List<String> cells = ship.getLocations();
+        boolean isVertical = cells.get(0).charAt(0) != cells.get(1).charAt(0);
+        for (int i = 0; i < cells.size(); i++){
+            if(i < cells.size() - 1){
+                if(isVertical){
+                    char yChar = cells.get(i).substring(0,1).charAt(0);
+                    char compareChar = cells.get(i+1).substring(0,1).charAt(0);
+                    if (compareChar - yChar != 1){
+                        return true;
+                    }
+                } else{
+                    Integer xInt = Integer.parseInt(cells.get(i).substring(1));
+                    Integer compareInt = Integer.parseInt(cells.get(i+1).substring(1));
+                    if (compareInt - xInt != 1){
+                        return true;
+                    }
+                }
+            }
+
+            for (int j= i +1; j < cells.size(); j++){
+                if (isVertical){
+                    if (!cells.get(i).substring(1).equals(cells.get(j).substring(1))){
+                        return true;
+                    }
+                }else{
+                    if (!cells.get(i).substring(0,1).equals(cells.get(j).substring(0,1))){
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private boolean areOverlapped(Set<Ship> ships){
+        List<String> allCells = new ArrayList<>();
+        ships.forEach(ship -> allCells.addAll(ship.getLocations()));
+        for (int i = 0; i < allCells.size(); i ++){
+            for (int j=i+1; j< allCells.size(); j++ ){
+                if (allCells.get(i).equals(allCells.get(j))){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
+
+
+

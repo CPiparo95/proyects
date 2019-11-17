@@ -200,12 +200,55 @@ const createShips = function (shipType, length, orientation, parent, isStatic) {
 
         })
     }
-
-
 }
 
 let data = {}
 var params = new URLSearchParams(window.location.search)
+
+var ships = ['gaucho1', 'gaucho2', 'gaucho3', 'gaucho4', 'gaucho5'];
+var shipsLocated = [];
+document.getElementById("collect-boats").addEventListener("click", function () {
+    getShips();
+});
+
+function getShips() {
+    for (let i = 0; i < ships.length; i++) {
+        let shipObject = {
+            type: "",
+            locations: []
+        }
+        let ship = document.getElementById(ships[i]);
+        if (ship.dataset.y != undefined && ship.dataset.x != undefined) {
+            shipObject.type = ship.id;
+
+            let config = document.getElementsByClassName(`${ships[i]}-busy-cell`);
+            for (let i = 0; i < config.length; i++) {
+                shipObject.locations.push(config[i].dataset.y + config[i].dataset.x);
+            }
+            shipsLocated.push(shipObject);
+        }
+    }
+    sendToBackend()
+}
+
+function sendToBackend() {
+    if(shipsLocated.length==5){
+        fetch("/api/placeShips/" + params.get("gp"), {
+                method: 'POST',
+                body: JSON.stringify(shipsLocated),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response=> {
+                return response.json();
+            })
+            .then(json => {
+                console.log(json);
+            })
+            .catch(ex => console.log(ex));
+    }
+}
 
 //fetch al java
 fetch("/api/game_view/" + params.get("gp"))
@@ -237,33 +280,50 @@ fetch("/api/game_view/" + params.get("gp"))
                 }
             }
         } else if (params.get("ships") == 1) {
-            data.ships.forEach(item => {
-                //item.ship_positions.sort()
-                createShips(item.ship_type, item.ship_positions.sort().length,
-                    'vertical', document.getElementById('ships' + item.ship_positions[0]), true)
-            })
-            for (n = 0; n <= data.game_players.length - 1; n++) { //este for consulta el nombre del jugador
-                if (data.game_players[n].game_player_id != params.get("gp")) {
-                    for (h = 0; h <= data.salvoes.length - 1; h++) { //este for comprueba que estemos en los salvos del jugador correcto
-                        if (data.game_players[n].player.user_name == data.salvoes[h].player_username) {
-                            for (l = 0; l <= data.salvoes[h].fire_positions.length - 1; l++) { //finalmente crea salvoes por cada jugador
-                                let shot = document.createElement("img");
-                                shot.setAttribute("src", "assets/ships/explosion.gif");
-                                shot.style.zIndex = 10;
-                                shot.style.width = "30px";
-                                shot.style.height = "30px";
-                                shot.style.margin = "2.5px";
-                                shot.style.position = "absolute";
-                                document.getElementById("ships" + data.salvoes[h].fire_positions[l]).appendChild(shot);
+            if(data.ships.length == 5){
+                data.ships.forEach(item => {
+                    if (item.ship_positions[0].slice(1) == item.ship_positions[1].slice(1)){
+                        createShips(item.ship_type, item.ship_positions.length,
+                        'vertical', document.getElementById('ships' + item.ship_positions[0]), true)
+                    }else{
+                        if (item.ship_positions[0].length > 2){
+                            createShips(item.ship_type, item.ship_positions.length,
+                            'horizontal', document.getElementById('ships' + item.ship_positions[1]), true)
+                        }
+                        createShips(item.ship_type, item.ship_positions.length,
+                        'horizontal', document.getElementById('ships' + item.ship_positions[0]), true)
+                    }
+                    
+                })
+                for (n = 0; n <= data.game_players.length - 1; n++) { //este for consulta el nombre del jugador
+                    if (data.game_players[n].game_player_id != params.get("gp")) {
+                        for (h = 0; h <= data.salvoes.length - 1; h++) { //este for comprueba que estemos en los salvos del jugador correcto
+                            if (data.game_players[n].player.user_name == data.salvoes[h].player_username) {
+                                for (l = 0; l <= data.salvoes[h].fire_positions.length - 1; l++) { //finalmente crea salvoes por cada jugador
+                                    let shot = document.createElement("img");
+                                    shot.setAttribute("src", "assets/ships/explosion.gif");
+                                    shot.style.zIndex = 10;
+                                    shot.style.width = "30px";
+                                    shot.style.height = "30px";
+                                    shot.style.margin = "2.5px";
+                                    shot.style.position = "absolute";
+                                    document.getElementById("ships" + data.salvoes[h].fire_positions[l]).appendChild(shot);
+                                    }
+                                    break
+                                }
                             }
                             break
                         }
                     }
-                    break
+                }else{
+                    createShips('gaucho1', 5, 'horizontal', document.getElementById('dock'),false)
+                    createShips('gaucho2', 4, 'horizontal', document.getElementById('dock'),false)
+                    createShips('gaucho3', 3, 'horizontal', document.getElementById('dock'),false)
+                    createShips('gaucho4', 3, 'horizontal', document.getElementById('dock'),false)
+                    createShips('gaucho5', 2, 'horizontal', document.getElementById('dock'),false)
                 }
             }
-        }
-    })
+        })
     .catch(function (error) {
         console.log(error)
     })
