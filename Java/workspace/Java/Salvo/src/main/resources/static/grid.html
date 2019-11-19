@@ -8,15 +8,25 @@
     </head>
 <body>
         <div id="app">
+            <div>
+                <nav style="border: 2px solid black; ">
+                    <ul style="list-style-type: none; display: flex; justify-content: space-around;">
+                      <li><button type="button"><a @click="logOut">Log Out</a></button></li>
+                      <li><button v-if="shipsPositioned == false" id="collect-boats" type="button"> guardar posiciones barcos </button> </li>
+                      <li><button type="button"> <a href="index.html"> Return to games </a></button> </li>
+                      <li><button v-if="salvoesFired == false && shipsPositioned == true" type="button"> <a onClick="sendSalvoes();"> send Salvos </a> </button> </li>
+                    </ul>
+                </nav>
+            </div>    
+            <div>
                 <div>
-                  <nav style="border: 2px solid black; ">
-                      <ul style="list-style-type: none; display: flex; justify-content: space-around;">
-                          <li><button type="button"><a @click="logOut">Log Out</a></button></li>
-                          <li> <button id="collect-boats" type="button"> guardar posiciones barcos </button> </li>
-                      </ul>
-                  </nav>
+                    <H1 style="text-align: left;">TURNO: {{turno}}</H1>
+                    <H1 style="text-align: center;" v-if="shipsPositioned == false">FASE DE COLOCACION DE BARCOS</H1>
+                    <H1 style="text-align: center;" v-if="shipsPositioned == true">FASE DE DISPARO DE SALVOS</H1>
                 </div>
+                <H3 style="text-align: center;" v-if="shipsPositioned == true">Posiciones a disparar: {{salvoesPositionsNotFire}}</H3>
             </div>
+        </div>
     <div class="flex-container">
         <div id="dock">
             <div id="display">
@@ -29,6 +39,10 @@
         
         <div id="grid">
             <!--The grid will appear here -->
+        </div>
+
+        <div id="salvoGrid">
+                <!--The grid will appear here -->
         </div>
     </div>
 

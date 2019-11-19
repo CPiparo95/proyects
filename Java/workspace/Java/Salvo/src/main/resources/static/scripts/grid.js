@@ -111,6 +111,7 @@ const createGrid = function(size, element, id){
 }
 
 createGrid(11, document.getElementById('grid'), 'ships')
+createGrid(11, document.getElementById('salvoGrid'), 'salvo')
 
 
 function checkBusyCells(ship, cell){

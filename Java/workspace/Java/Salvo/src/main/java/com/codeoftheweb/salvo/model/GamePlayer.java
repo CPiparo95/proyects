@@ -31,6 +31,10 @@ public class GamePlayer {
     @JoinColumn(name="game_id")
     private Game game;
 
+    private List<String> hits = new ArrayList<>();
+
+    private ArrayList <List<String>> sinks = new ArrayList <List<String>>();
+
     private LocalDateTime joinTime;
 
     private Boolean host;
@@ -121,6 +125,14 @@ public class GamePlayer {
         String formatDateTime = joinTime.format(formateador);
 
         return formatDateTime;
+    }
+
+    public List<String> getHits() {
+        return hits;
+    }
+
+    public void addHits(List<String> hits) {
+        this.hits.addAll(hits);
     }
 
     public long getId() {

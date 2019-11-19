@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.*;
@@ -19,19 +20,15 @@ import java.util.stream.*;
 @RequestMapping("/api")
 public class AppController {
 
+    private GamePlayer gp;
+
+    private Ship ship;
+
     @Autowired
     PasswordEncoder encoder;
 
     @Autowired
     private ShipRepository shipRepo;
-
-    private GamePlayer gp;
-
-    private Set<Positions> positions;
-
-    private Positions position;
-
-    private Ship ship;
 
     @Autowired
     private PlayerRepository playerRepo;
@@ -47,10 +44,9 @@ public class AppController {
 
     //POST PARA CREAR PLAYERS
     @RequestMapping(value = "/players", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> register(
-            @RequestParam String email,
-            @RequestParam String username,
-            @RequestParam String password) {
+    public ResponseEntity<Map<String, Object>> register(@RequestParam String email,
+                                                        @RequestParam String username,
+                                                        @RequestParam String password) {
 
         Map<String, Object> map = new HashMap<>();
 
@@ -71,32 +67,32 @@ public class AppController {
     }
 
     //POST PARA UNIRSE A JUEGOS
-
     @RequestMapping(value = "/joinGame/{gameId}", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> joinGame(Authentication authentication, @PathVariable Long gameId) {
+    public ResponseEntity<Map<String, Object>> joinGame(Authentication authentication,
+                                                        @PathVariable Long gameId) {
         Map<String, Object> dto = new HashMap<>();
-        if(isGuest(authentication)) {
+        if (isGuest(authentication)) {
             dto.put("ERROR", "No se puede loguear si estas desconectado, por favor conectate");
-            return new ResponseEntity<>(dto,HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(dto, HttpStatus.UNAUTHORIZED);
         }
 
         Game game = gameRepo.findById(gameId).orElse(null);
-        if(game == null){
+        if (game == null) {
             dto.put("ERROR", "No se puede conectar a un juego inexistente");
-            return new ResponseEntity<>(dto,HttpStatus.NOT_FOUND);
-        }else if (game.getGamePlayers().size() > 1){
+            return new ResponseEntity<>(dto, HttpStatus.NOT_FOUND);
+        } else if (game.getGamePlayers().size() > 1) {
             dto.put("ERROR", "La sala esta llena");
-            return new ResponseEntity<>(dto,HttpStatus.FORBIDDEN);
-        }else{
+            return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
+        } else {
             Player player = playerRepo.findByUsername(authentication.getName());
-            if (game.getGamePlayers().stream().anyMatch(gp -> gp.getPlayer().getId() == player.getId())){
+            if (game.getGamePlayers().stream().anyMatch(gp -> gp.getPlayer().getId() == player.getId())) {
                 dto.put("ERROR", "No podes jugar contra vos mismo...");
-                return new ResponseEntity<>(dto,HttpStatus.FORBIDDEN);
-            }else{
-                GamePlayer newgp = new GamePlayer(player,game,LocalDateTime.now(),false);
+                return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
+            } else {
+                GamePlayer newgp = new GamePlayer(player, game, LocalDateTime.now(), false);
                 gamePlayerRepo.save(newgp);
                 dto.put("Success", "Te has unido al juego correctamente");
-                return new ResponseEntity<>(dto,HttpStatus.CREATED);
+                return new ResponseEntity<>(dto, HttpStatus.CREATED);
             }
         }
     }
@@ -115,49 +111,50 @@ public class AppController {
         Player player = playerRepo.findByUsername(authentication.getName());
         Game game = gameRepo.save(new Game(LocalDateTime.now()));
 
-        gp = gamePlayerRepo.save(new GamePlayer(player,game,game.getCreationTime(),true));
+        gp = gamePlayerRepo.save(new GamePlayer(player, game, game.getCreationTime(), true));
         dto.put(" Success ", " El juego ha sido creado, y usted se ha unido a el");
         dto.put("gamePlayerID", gp.getId());
-        return new ResponseEntity<>(dto,HttpStatus.CREATED);
+        return new ResponseEntity<>(dto, HttpStatus.CREATED);
     }
 
+    //POST PARA GUARDAR LOS BARCOS
     @RequestMapping(value = "/placeShips/{gpId}", method = RequestMethod.POST)
     public ResponseEntity<Map<String, Object>> addShips(Authentication authentication,
-                                                                 @PathVariable Long gpId,
-                                                                 @RequestBody Set<Ship> ships) {
+                                                        @PathVariable Long gpId,
+                                                        @RequestBody Set<Ship> ships) {
 
         Map<String, Object> dto = new HashMap<>();
 
         if (isGuest(authentication)) {
             dto.put("Error", "Guest's cannot play games or place ships");
             return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
-        }else{
+        } else {
             GamePlayer gp = gamePlayerRepo.findById(gpId).orElse(null);
             Player player = playerRepo.findByUsername(authentication.getName());
-            if (gp == null){
+            if (gp == null) {
                 dto.put("Error", "This game does not exist!");
                 return new ResponseEntity<>(dto, HttpStatus.NOT_FOUND);
-            }else if(gp.getPlayer().getId() != player.getId()){
+            } else if (gp.getPlayer().getId() != player.getId()) {
                 dto.put("Error", "You are not playing this game!");
                 return new ResponseEntity<>(dto, HttpStatus.UNAUTHORIZED);
-            }else if(gp.getShip().size()>0){
+            } else if (gp.getShip().size() > 0) {
                 dto.put("Error", "there are already ships positioned");
                 return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
-            }else if(ships== null || ships.size() != 5){
+            } else if (ships == null || ships.size() != 5) {
                 dto.put("Error", "There is not enough ships or you placed yoo much ships! (You have to add 5 ships)");
                 return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
-            }else{
-                if(ships.stream().anyMatch(ship -> this.isOutOfRange(ship))){
+            } else {
+                if (ships.stream().anyMatch(this::isOutOfRange)) {
                     dto.put("Error", "You have ships out of range");
                     return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
-                }else if (ships.stream().anyMatch(ship -> this.isNotConsecutive(ship))){
+                } else if (ships.stream().anyMatch(this::isNotConsecutive)) {
                     dto.put("Error", "Your ships are not consecutive!");
                     return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
-                }else if (this.areOverlapped(ships)){
+                } else if (this.areOverlapped(ships)) {
                     dto.put("Error", "Your ships are overlapped!");
                     return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
-                }else {
-                    ships.forEach(ship -> gp.addShip(ship));
+                } else {
+                    ships.forEach(gp::addShip);
 
                     gamePlayerRepo.save(gp);
 
@@ -167,6 +164,50 @@ public class AppController {
             }
         }
     }
+
+    //POST PARA GUARDAR SALVOS
+    @RequestMapping(value = "/fireSalvoes/{gpId}", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> addSalvoes(Authentication authentication,
+                                                          @PathVariable Long gpId,
+                                                          @RequestBody Salvoes salvoes) {
+        Map<String, Object> dto = new HashMap<>();
+        if (isGuest(authentication)) {
+            dto.put("Error", "Guest's cannot play games or fire salvoes");
+            return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
+        } else {
+            GamePlayer gp = gamePlayerRepo.findById(gpId).orElse(null);
+            Player player = playerRepo.findByUsername(authentication.getName());
+            if (gp == null) {
+                dto.put("Error", "This game does not exist!");
+                return new ResponseEntity<>(dto, HttpStatus.NOT_FOUND);
+            } else if (gp.getPlayer().getId() != player.getId()) {
+                dto.put("Error", "You are not playing this game!");
+                return new ResponseEntity<>(dto, HttpStatus.UNAUTHORIZED);
+            } else if (gp.getSalvoes().stream().anyMatch(salvo -> salvo.getTurn() == salvoes.getTurn())) {
+                dto.put("Error", "the salvoes have been already fired!");
+                return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
+            } else if (salvoes == null || salvoes.getLocations().size() != 5) {
+                dto.put("Error", "There is not enough salvoes fired or you have fired more than 5 salvoes");
+                return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
+            }else if (this.areOverlappedsalvos(gp.getSalvoes(), salvoes)) {
+                dto.put("Error", "Your salvos are overlapped!");
+                return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
+            }else if (gp.getGame().getGamePlayers()) {
+                dto.put("Error", "You cannot fire salvos if the opponent has not placed it's ships!");
+                return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
+            }else if (gp.getSalvoes().size()+1 != salvoes.getTurn()) {
+                dto.put("Error", "The turn is incorrect, galactic lynx of the southern patagonian plains!");
+                return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
+            }else{
+            gp.addSalvoes(salvoes);
+
+            gamePlayerRepo.save(gp);
+
+            dto.put("Success", "Salvoes have been fired!");
+            return new ResponseEntity<>(dto, HttpStatus.CREATED);
+        }
+    }
+}
 
     //GET PIDE JUEGOS, TAMBIEN INDICA QUIEN ESTA CONECTADO
     @RequestMapping("/games")
@@ -307,6 +348,20 @@ public class AppController {
     private boolean areOverlapped(Set<Ship> ships){
         List<String> allCells = new ArrayList<>();
         ships.forEach(ship -> allCells.addAll(ship.getLocations()));
+        for (int i = 0; i < allCells.size(); i ++){
+            for (int j=i+1; j< allCells.size(); j++ ){
+                if (allCells.get(i).equals(allCells.get(j))){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean areOverlappedsalvos(Set<Salvoes> salvoes, Salvoes intendingSalvo){
+        List<String> allCells = new ArrayList<>();
+        salvoes.forEach(salvo -> allCells.addAll(salvo.getLocations()));
+        allCells.addAll(intendingSalvo.getLocations());
         for (int i = 0; i < allCells.size(); i ++){
             for (int j=i+1; j< allCells.size(); j++ ){
                 if (allCells.get(i).equals(allCells.get(j))){

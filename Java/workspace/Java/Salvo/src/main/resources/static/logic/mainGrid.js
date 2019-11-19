@@ -1,6 +1,11 @@
 const app = new Vue({
     el: '#app',
     data: {
+        shipsPositioned: false,
+        salvoesFired: false,
+        salvoesPositionsNotFire: [],
+        salvoesPositionsFire: [],
+        turno : 0
     },
     methods:{
         logOut: function(ev){

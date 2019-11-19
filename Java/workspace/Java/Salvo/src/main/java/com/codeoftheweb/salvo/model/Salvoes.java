@@ -3,9 +3,7 @@ package com.codeoftheweb.salvo.model;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 public class Salvoes {
@@ -19,15 +17,16 @@ public class Salvoes {
     private GamePlayer gamePlayer;
 
     @ElementCollection
-    private Set<Positions> positions;
+    @Column(name = "locations")
+    private List<String> locations = new ArrayList<>();
 
-    private String turn;
+    private Integer turn;
 
     public Salvoes() { }
 
-    public Salvoes(String turn, Set<Positions> positions) {
+    public Salvoes(Integer turn, List<String> locations) {
         this.turn = turn;
-        this.positions = positions;
+        this.locations = locations;
     }
 
     public Map<String, Object> salvoesDTO(){
@@ -35,7 +34,7 @@ public class Salvoes {
         dto.put("salvo_id",this.id);
         dto.put("player_username", this.getGamePlayer().getPlayer().getUserName());
         dto.put("turn", this.getTurn());
-        dto.put("fire_positions",this.getPositions());
+        dto.put("fire_positions",this.getLocations());
         return dto;
     }
 
@@ -43,24 +42,23 @@ public class Salvoes {
         return gamePlayer;
     }
 
-    public Set<Positions> getPositions() {
-        return positions;
+    public List<String> getLocations() {
+        return locations;
     }
 
-    public void setPositions(Set<Positions> positions) {
-        this.positions = positions;
+    public void setLocations(List<String> locations) {
+        this.locations = locations;
     }
 
     public void setGamePlayer(GamePlayer gamePlayer) {
         this.gamePlayer = gamePlayer;
     }
 
-    public String getTurn() {
+    public Integer getTurn() {
         return turn;
     }
 
-    public void setTurn(String turn) {
+    public void setTurn(Integer turn) {
         this.turn = turn;
     }
-
 }

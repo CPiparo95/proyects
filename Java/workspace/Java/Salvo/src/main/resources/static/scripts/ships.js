@@ -204,7 +204,7 @@ const createShips = function (shipType, length, orientation, parent, isStatic) {
 
 let data = {}
 var params = new URLSearchParams(window.location.search)
-
+let salvoArray = []
 var ships = ['gaucho1', 'gaucho2', 'gaucho3', 'gaucho4', 'gaucho5'];
 var shipsLocated = [];
 document.getElementById("collect-boats").addEventListener("click", function () {
@@ -244,13 +244,63 @@ function sendToBackend() {
                 return response.json();
             })
             .then(json => {
-                console.log(json);
+                alert(JSON.stringify(json));
+                
+                window.location.reload(true)
             })
             .catch(ex => console.log(ex));
     }
 }
 
-//fetch al java
+window.addEventListener("load", function(){
+    let salvoCells = document.querySelectorAll("#salvoGrid .grid-cell");
+    salvoCells.forEach(element => {
+        element.addEventListener("click", function(evt){
+          let clicked = evt.currentTarget;
+          let location = clicked.dataset.y + clicked.dataset.x;
+          if (app.salvoesPositionsFire.includes(location) || (app.salvoesPositionsNotFire.includes(location))) {
+            alert("La posicion ya fue ingresada");
+          } else if (app.salvoesPositionsNotFire.length == 5) {
+            alert("ya disparaste todos tus tiros, si quieres cambiar las posiciones recarga la pagina.");
+          }else if (app.shipsPositioned == false){
+            alert("Todabia no es fase de disparos.");
+          }else{
+              document.getElementById("salvo" + location).style.backgroundColor="red"
+              app.salvoesPositionsNotFire.push(location);
+          }
+      });
+    });
+  })
+
+  function sendSalvoes() {
+    if(app.salvoesPositionsNotFire.length==5){
+        let salvoObject = {
+            turn: 0,
+            locations: []
+        }
+        salvoObject.turn = app.turno
+        salvoObject.locations = app.salvoesPositionsNotFire
+
+        fetch("/api/fireSalvoes/" + params.get("gp"), {
+                method: 'POST',
+                body: JSON.stringify(salvoObject),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response=> {
+                return response.json();
+            })
+            .then(json => {
+                alert(JSON.stringify(json));
+                app.salvoesFired = true
+                window.location.reload(true)
+            })
+            .catch(ex => console.log(ex));
+    }
+}
+
+//fetch para cargar tanto salvos como barcos, tambien indica la fase y el turno
 fetch("/api/game_view/" + params.get("gp"))
     .then(function (response) {
         return response.json()
@@ -258,7 +308,15 @@ fetch("/api/game_view/" + params.get("gp"))
     .then(json => {
         console.log(json)
         data = json.data
-        if (params.get("salvoesFire") == 1) {
+
+        //DETECTA EL TURNO EN BASE A LA CANTIDAD DE SALVOS Y LO GUARDA EN app.turno
+        let parImpar = (data.salvoes.length %2)? "impar":"par"
+        if (parImpar == "par") {
+            app.turno = (data.salvoes.length / 2) + 1
+        }else{
+            app.turno = ((data.salvoes.length - 1) / 2) + 1
+        }
+            //ESTE FOR GIGANTE MANDA LOS SALVOS QUE NOSOTROS DISPARAMOS CON ANTERIORIDAD
             for (n = 0; n <= data.game_players.length - 1; n++) { //este for consulta el nombre del jugador
                 if (data.game_players[n].game_player_id == params.get("gp")) {
                 for (h = 0; h <= data.salvoes.length - 1; h++) { //este for comprueba que estemos en los salvos del jugador correcto
@@ -271,17 +329,20 @@ fetch("/api/game_view/" + params.get("gp"))
                                 shot.style.height = "30px";
                                 shot.style.margin = "2.5px";
                                 shot.style.position = "absolute";
-                                document.getElementById("ships" + data.salvoes[h].fire_positions[l]).appendChild(shot);
+                                document.getElementById("salvo" + data.salvoes[h].fire_positions[l]).appendChild(shot);
+                                app.salvoesPositionsFire.push(data.salvoes[h].fire_positions[l])
+                                if(app.salvoesPositionsFire.length >= 5*(app.turno+1)){
+                                    app.salvoesFired = true
+                                }
                             }
-                            break
                         }
                     }
-                    break
                 }
             }
-        } else if (params.get("ships") == 1) {
+            //CARGA LOS BARCOS
             if(data.ships.length == 5){
-                data.ships.forEach(item => {
+                app.shipsPositioned = true //CAMBIA EL TITULO, osea, LA FASE
+                data.ships.forEach(item => { //CARGA LOS BARCOS EN LA GRILLA
                     if (item.ship_positions[0].slice(1) == item.ship_positions[1].slice(1)){
                         createShips(item.ship_type, item.ship_positions.length,
                         'vertical', document.getElementById('ships' + item.ship_positions[0]), true)
@@ -295,6 +356,7 @@ fetch("/api/game_view/" + params.get("gp"))
                     }
                     
                 })
+                //CARGA LOS SALVOS QUE NOS TIRARON A NOSOTROS
                 for (n = 0; n <= data.game_players.length - 1; n++) { //este for consulta el nombre del jugador
                     if (data.game_players[n].game_player_id != params.get("gp")) {
                         for (h = 0; h <= data.salvoes.length - 1; h++) { //este for comprueba que estemos en los salvos del jugador correcto
@@ -309,12 +371,11 @@ fetch("/api/game_view/" + params.get("gp"))
                                     shot.style.position = "absolute";
                                     document.getElementById("ships" + data.salvoes[h].fire_positions[l]).appendChild(shot);
                                     }
-                                    break
                                 }
                             }
-                            break
                         }
                     }
+                    //CARGA LOS BARCOS EN CASO DE QUE NO LOS HAYAMOS COLOCADO
                 }else{
                     createShips('gaucho1', 5, 'horizontal', document.getElementById('dock'),false)
                     createShips('gaucho2', 4, 'horizontal', document.getElementById('dock'),false)
@@ -322,7 +383,6 @@ fetch("/api/game_view/" + params.get("gp"))
                     createShips('gaucho4', 3, 'horizontal', document.getElementById('dock'),false)
                     createShips('gaucho5', 2, 'horizontal', document.getElementById('dock'),false)
                 }
-            }
         })
     .catch(function (error) {
         console.log(error)

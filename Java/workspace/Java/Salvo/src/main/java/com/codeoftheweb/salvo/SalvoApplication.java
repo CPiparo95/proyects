@@ -48,28 +48,6 @@ public class SalvoApplication {
             Game juego03 = gameRepository.save(new Game(LocalDateTime.now()));
             Game juego04 = gameRepository.save(new Game(LocalDateTime.now()));
 
-            String[] barco1 = {"A1","B1","C1","D1"};
-            String[] barco2 = {"E8","F8","G8"};
-            String[] barco3 = {"D3","D4"};
-            String[] barco4 = {"A4","B4","C4","D4","E4"};
-            String[] barco5 = {"A7","A8","A9","A10"};
-            String[] barco6 = {"C1","D1","E1","F1"};
-            String[] barco7 = {"C8","D8","E8"};
-            String[] barco8 = {"A3","A4"};
-            String[] barco9 = {"B4","C4","D4","E4","F4"};
-            String[] barco10 = {"A7","A8","A9","A10"};
-
-            Ship nave01 = shipRepository.save(new Ship("gaucho1", Arrays.asList(barco1)));
-            Ship nave02 = shipRepository.save(new Ship("gaucho2",Arrays.asList(barco3)));
-            Ship nave03 = shipRepository.save(new Ship("gaucho3",Arrays.asList(barco3)));
-            Ship nave04 = shipRepository.save(new Ship("gaucho4",Arrays.asList(barco4)));
-            Ship nave05 = shipRepository.save(new Ship("gaucho5",Arrays.asList(barco5)));
-            Ship nave06 = shipRepository.save(new Ship("gaucho1",Arrays.asList(barco6)));
-            Ship nave07 = shipRepository.save(new Ship("gaucho2",Arrays.asList(barco7)));
-            Ship nave08 = shipRepository.save(new Ship("gaucho3",Arrays.asList(barco8)));
-            Ship nave09 = shipRepository.save(new Ship("gaucho4",Arrays.asList(barco9)));
-            Ship nave10 = shipRepository.save(new Ship("gaucho5",Arrays.asList(barco10)));
-
             GamePlayer relacion1 = gamePlayerRepository.save(new GamePlayer(player1, juego01, juego01.getCreationTime(), true));
             GamePlayer relacion2 = gamePlayerRepository.save(new GamePlayer(player2, juego01, LocalDateTime.now(), false));
             GamePlayer relacion3 = gamePlayerRepository.save(new GamePlayer(player1, juego02, juego02.getCreationTime(), true));
@@ -84,6 +62,28 @@ public class SalvoApplication {
             Score score3 = scoreRepository.save(new Score(player4, juego03, LocalDateTime.now(), 0.5));
             Score score4 = scoreRepository.save(new Score(player5, juego03, LocalDateTime.now(), 0.5));
 
+            String[] barco1 = {"A1","B1","C1","D1"};
+            String[] barco2 = {"E8","F8","G8"};
+            String[] barco3 = {"D2","D3"};
+            String[] barco4 = {"A4","B4","C4","D4","E4"};
+            String[] barco5 = {"A7","A8","A9","A10"};
+            String[] barco6 = {"C1","D1","E1","F1"};
+            String[] barco7 = {"C8","D8","E8"};
+            String[] barco8 = {"A3","A4"};
+            String[] barco9 = {"B4","C4","D4","E4","F4"};
+            String[] barco10 = {"A7","A8","A9","A10"};
+
+            Ship nave01 = shipRepository.save(new Ship("gaucho1", Arrays.asList(barco1)));
+            Ship nave02 = shipRepository.save(new Ship("gaucho2",Arrays.asList(barco3)));
+            Ship nave03 = shipRepository.save(new Ship("gaucho3",Arrays.asList(barco2)));
+            Ship nave04 = shipRepository.save(new Ship("gaucho4",Arrays.asList(barco4)));
+            Ship nave05 = shipRepository.save(new Ship("gaucho5",Arrays.asList(barco5)));
+            Ship nave06 = shipRepository.save(new Ship("gaucho1",Arrays.asList(barco6)));
+            Ship nave07 = shipRepository.save(new Ship("gaucho2",Arrays.asList(barco7)));
+            Ship nave08 = shipRepository.save(new Ship("gaucho3",Arrays.asList(barco8)));
+            Ship nave09 = shipRepository.save(new Ship("gaucho4",Arrays.asList(barco9)));
+            Ship nave10 = shipRepository.save(new Ship("gaucho5",Arrays.asList(barco10)));
+
             relacion1.addShip(nave01);
             relacion1.addShip(nave02);
             relacion1.addShip(nave03);
@@ -95,26 +95,18 @@ public class SalvoApplication {
             relacion2.addShip(nave09);
             relacion2.addShip(nave10);
 
-            Set<Positions> salvoesFire01 = new HashSet<>();
-            Set<Positions> salvoesFire02 = new HashSet<>();
-            salvoesFire01.add(Positions.E1);
-            salvoesFire01.add(Positions.A1);
-            salvoesFire01.add(Positions.G10);
-            salvoesFire01.add(Positions.H7);
-            salvoesFire01.add(Positions.C2);
-            salvoesFire02.add(Positions.A9);
-            salvoesFire02.add(Positions.E5);
-            salvoesFire02.add(Positions.A5);
-            salvoesFire02.add(Positions.B2);
-            salvoesFire02.add(Positions.I6);
-            salvoesFire02.add(Positions.B3);
-            salvoesFire02.add(Positions.F9);
 
-            Salvoes salvo01 = salvoesRepository.save(new Salvoes("Turno1", salvoesFire01));
-            Salvoes salvo02 = salvoesRepository.save(new Salvoes("Turno1", salvoesFire02));
+            String[] salvoesFire01 = {"E1","A1","G10","H7", "C2"};
+            String[] salvoesFire02 = {"E9","E5","A5", "B2", "I6"};
+            String[] salvoesFire03 = {"A2","F3","D8","B2", "E5"};
+
+            Salvoes salvo01 = salvoesRepository.save(new Salvoes(1, Arrays.asList(salvoesFire01)));
+            Salvoes salvo02 = salvoesRepository.save(new Salvoes(2, Arrays.asList(salvoesFire02)));
+            Salvoes salvo03 = salvoesRepository.save(new Salvoes(3, Arrays.asList(salvoesFire03)));
 
             relacion1.addSalvoes(salvo01);
             relacion2.addSalvoes(salvo02);
+            //relacion1.addSalvoes(salvo03);
 
             gamePlayerRepository.save(relacion1);
             gamePlayerRepository.save(relacion2);
