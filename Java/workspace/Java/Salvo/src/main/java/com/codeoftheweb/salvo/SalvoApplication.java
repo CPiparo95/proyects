@@ -73,7 +73,7 @@ public class SalvoApplication {
             String[] barco9 = {"B4","C4","D4","E4","F4"};
             String[] barco10 = {"A7","A8","A9","A10"};
 
-            Ship nave01 = shipRepository.save(new Ship("gaucho1", Arrays.asList(barco1)));
+            Ship nave01 = shipRepository.save(new Ship("gaucho1",Arrays.asList(barco1)));
             Ship nave02 = shipRepository.save(new Ship("gaucho2",Arrays.asList(barco3)));
             Ship nave03 = shipRepository.save(new Ship("gaucho3",Arrays.asList(barco2)));
             Ship nave04 = shipRepository.save(new Ship("gaucho4",Arrays.asList(barco4)));

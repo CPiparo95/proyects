@@ -22,10 +22,18 @@ public class Salvoes {
 
     private Integer turn;
 
+    @ElementCollection
+    @Column(name = "hits")
+    private List<String> hits = new ArrayList<>();
+
     public Salvoes() { }
 
     public Salvoes(Integer turn, List<String> locations) {
         this.turn = turn;
+        this.locations = locations;
+    }
+
+    public Salvoes(List<String> locations) {
         this.locations = locations;
     }
 
@@ -35,8 +43,10 @@ public class Salvoes {
         dto.put("player_username", this.getGamePlayer().getPlayer().getUserName());
         dto.put("turn", this.getTurn());
         dto.put("fire_positions",this.getLocations());
+        dto.put("hits", this.getHits());
         return dto;
     }
+
 
     public GamePlayer getGamePlayer() {
         return gamePlayer;
@@ -60,5 +70,13 @@ public class Salvoes {
 
     public void setTurn(Integer turn) {
         this.turn = turn;
+    }
+
+    public List<String> getHits() {
+        return hits;
+    }
+
+    public void setHits(String hits) {
+        this.hits.add(hits);
     }
 }

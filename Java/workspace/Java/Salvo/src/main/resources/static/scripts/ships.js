@@ -275,10 +275,8 @@ window.addEventListener("load", function(){
   function sendSalvoes() {
     if(app.salvoesPositionsNotFire.length==5){
         let salvoObject = {
-            turn: 0,
             locations: []
         }
-        salvoObject.turn = app.turno
         salvoObject.locations = app.salvoesPositionsNotFire
 
         fetch("/api/fireSalvoes/" + params.get("gp"), {
@@ -297,6 +295,8 @@ window.addEventListener("load", function(){
                 window.location.reload(true)
             })
             .catch(ex => console.log(ex));
+    }else{
+        alert("se va a caer, digo, tenes que mandar 5 salvos, ni mas ni menos")
     }
 }
 
@@ -316,6 +316,7 @@ fetch("/api/game_view/" + params.get("gp"))
         }else{
             app.turno = ((data.salvoes.length - 1) / 2) + 1
         }
+
             //ESTE FOR GIGANTE MANDA LOS SALVOS QUE NOSOTROS DISPARAMOS CON ANTERIORIDAD
             for (n = 0; n <= data.game_players.length - 1; n++) { //este for consulta el nombre del jugador
                 if (data.game_players[n].game_player_id == params.get("gp")) {

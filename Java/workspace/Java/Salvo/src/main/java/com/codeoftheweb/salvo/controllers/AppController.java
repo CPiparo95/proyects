@@ -1,9 +1,7 @@
 package com.codeoftheweb.salvo.controllers;
 import com.codeoftheweb.salvo.model.*;
 import com.codeoftheweb.salvo.repositorys.*;
-import com.sun.java.swing.plaf.windows.WindowsTextAreaUI;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -177,6 +175,9 @@ public class AppController {
         } else {
             GamePlayer gp = gamePlayerRepo.findById(gpId).orElse(null);
             Player player = playerRepo.findByUsername(authentication.getName());
+
+            //SETEA EL TURNO DEL SALVO QUE ACABA DE LLEGAR
+            salvoes.setTurn(gp.getSalvoes().size()+1);
             if (gp == null) {
                 dto.put("Error", "This game does not exist!");
                 return new ResponseEntity<>(dto, HttpStatus.NOT_FOUND);
@@ -190,13 +191,13 @@ public class AppController {
                 dto.put("Error", "There is not enough salvoes fired or you have fired more than 5 salvoes");
                 return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
             }else if (this.areOverlappedsalvos(gp.getSalvoes(), salvoes)) {
-                dto.put("Error", "Your salvos are overlapped!");
+                dto.put("Error", "No seas boludo, tenes salvos overlapeados");
                 return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
-            }else if (gp.getGame().getGamePlayers()) {
+            }else if (getOponentGP(gp) == null) {
+                dto.put("Error", "You cannot fire salvoes if you have no opponent! what you want to fire? water?");
+                return new ResponseEntity<>(dto, HttpStatus.I_AM_A_TEAPOT);
+            }else if (getOponentGP(gp).getShip().size() == 0) {
                 dto.put("Error", "You cannot fire salvos if the opponent has not placed it's ships!");
-                return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
-            }else if (gp.getSalvoes().size()+1 != salvoes.getTurn()) {
-                dto.put("Error", "The turn is incorrect, galactic lynx of the southern patagonian plains!");
                 return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
             }else{
             gp.addSalvoes(salvoes);
@@ -256,6 +257,19 @@ public class AppController {
     @RequestMapping("/players/{playerID}")
     public Map<String, Object> getPlayerView(@PathVariable long playerID){
         return this.playerViewDTO(playerRepo.findById(playerID).orElse(null));
+    }
+
+    private boolean addHits(GamePlayer gp, Salvoes salvo){
+        List<String> allCells = new ArrayList<>();
+        gp.getShip().forEach(ship -> allCells.addAll(ship.getLocations()));
+        for (int i=0; i < allCells.size(); i++){
+            for (int j=0; j < salvo.getLocations().size(); j++){
+                if (allCells.get(i).equals(salvo.getLocations().get(j))) {
+                    salvo.setHits(allCells.get(i));
+                }
+            }
+        }
+        return true;
     }
 
     //DTO
@@ -370,6 +384,11 @@ public class AppController {
             }
         }
         return false;
+    }
+
+    private GamePlayer getOponentGP (GamePlayer myGP){
+        return myGP.getGame().getGamePlayers().stream().filter
+                (gpa -> gpa.getId() != myGP.getId()).findFirst().orElse(null);
     }
 }
 
