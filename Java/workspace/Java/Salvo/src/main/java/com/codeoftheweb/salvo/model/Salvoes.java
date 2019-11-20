@@ -26,6 +26,10 @@ public class Salvoes {
     @Column(name = "hits")
     private List<String> hits = new ArrayList<>();
 
+    @ElementCollection
+    @Column(name = "sinks")
+    private Set<Ship> sinks;
+
     public Salvoes() { }
 
     public Salvoes(Integer turn, List<String> locations) {
@@ -78,5 +82,13 @@ public class Salvoes {
 
     public void setHits(String hits) {
         this.hits.add(hits);
+    }
+
+    public Set<Ship> getSinks() {
+        return sinks;
+    }
+
+    public void setSinks(Set<Ship> sinks) {
+        this.sinks = sinks;
     }
 }
