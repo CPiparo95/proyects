@@ -317,13 +317,25 @@ fetch("/api/game_view/" + params.get("gp"))
             app.turno = ((data.salvoes.length - 1) / 2) + 1
         }
 
+        let 
+        for (n = 0; n <= data.game_players.length - 1; n++) {
+            if (data.game_players[n].game_player_id == params.get("gp")) {
+                data.game_players[n].sinks.forEach(sink => {
+                    
+                });
+            }
+        }
+
             //ESTE FOR GIGANTE MANDA LOS SALVOS QUE NOSOTROS DISPARAMOS CON ANTERIORIDAD
             for (n = 0; n <= data.game_players.length - 1; n++) { //este for consulta el nombre del jugador
                 if (data.game_players[n].game_player_id == params.get("gp")) {
+
                 for (h = 0; h <= data.salvoes.length - 1; h++) { //este for comprueba que estemos en los salvos del jugador correcto
                         if (data.game_players[n].player.user_name == data.salvoes[h].player_username) {
                             for (l = 0; l <= data.salvoes[h].fire_positions.length - 1; l++) { //finalmente crea salvoes por cada jugador
-                                let shot = document.createElement("img");
+                                data.salvoes[h].hits.forEach(hit => {
+                                    if(hit == data.salvoes[h].fire_positions[l]){
+                                        let shot = document.createElement("img");
                                 shot.setAttribute("src", "assets/ships/explosion.gif");
                                 shot.style.zIndex = 10;
                                 shot.style.width = "30px";
@@ -335,6 +347,21 @@ fetch("/api/game_view/" + params.get("gp"))
                                 if(app.salvoesPositionsFire.length >= 5*(app.turno+1)){
                                     app.salvoesFired = true
                                 }
+                                    }else{
+                                        let shot = document.createElement("img");
+                                        shot.setAttribute("src", "assets/ships/explosion_agua.jpg");
+                                        shot.style.zIndex = 10;
+                                        shot.style.width = "30px";
+                                        shot.style.height = "30px";
+                                        shot.style.margin = "2.5px";
+                                        shot.style.position = "absolute";
+                                        document.getElementById("salvo" + data.salvoes[h].fire_positions[l]).appendChild(shot);
+                                        app.salvoesPositionsFire.push(data.salvoes[h].fire_positions[l])
+                                        if(app.salvoesPositionsFire.length >= 5*(app.turno+1)){
+                                            app.salvoesFired = true
+                                        }
+                                    }
+                                });
                             }
                         }
                     }

@@ -31,6 +31,10 @@ public class GamePlayer {
     @JoinColumn(name="game_id")
     private Game game;
 
+    @ElementCollection
+    @Column(name = "sinks")
+    private Set<Ship> sinks;
+
     private LocalDateTime joinTime;
 
     private Boolean host;
@@ -66,6 +70,7 @@ public class GamePlayer {
         dto.put("join_time", this.convertToNormalTime(getJoinTime()));
         dto.put("is_host",this.getHost());
         dto.put("player", this.getPlayer().playerDTO());
+        dto.put("sinks",this.getSinks().stream().map(Ship::shipDTO));
 
         Score score = this.getPlayer().getScoreByGame(this.getGame());
         if (score != null){
@@ -121,6 +126,14 @@ public class GamePlayer {
         String formatDateTime = joinTime.format(formateador);
 
         return formatDateTime;
+    }
+
+    public Set<Ship> getSinks() {
+        return sinks;
+    }
+
+    public void setSinks(Ship sink) {
+        this.sinks.add(sink);
     }
 
     public long getId() {

@@ -203,9 +203,9 @@ public class AppController {
                 dto.put("Error", "you have to wait to you opponent to fire salvos!");
                 return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
             }else{
-            addHits(getOponentGP(gp),salvoes);
-            //addSinks(getOponentGP(gp),salvoes);
-            gp.addSalvoes(salvoes);
+            addHits(salvoes, gp);//AGREGA LOS HITS A BARCOS
+            gp.addSalvoes(salvoes);//AGREGA LOS SALVOS A LA RELACION
+            addSinks(gp);//AGREGA LOS SINKS EN GAMEPLAYER
 
             gamePlayerRepo.save(gp);
 
@@ -265,9 +265,12 @@ public class AppController {
     }
 
     //AGREGA LOS HITS A SALVO -- ERROR, REPITE EL SALVO 2 VECES, CHEQUEAR CONTRA JACK EL PRIMER JUEGO, DISPARAR SOBRE C8
-    private void addHits(GamePlayer gp, Salvoes salvo){
+    public void addHits(Salvoes salvo, GamePlayer gp){
         List<String> allCells = new ArrayList<>();
+        gp = getOponentGP(gp);
+
         gp.getShip().forEach(ship -> allCells.addAll(ship.getLocations()));
+
         for (String allCell : allCells) {
             for (int j = 0; j < salvo.getLocations().size(); j++) {
                 if (allCell.equals(salvo.getLocations().get(j))) {
@@ -278,25 +281,19 @@ public class AppController {
     }
 
     //AGREGA LOS SINKS A SALVO
-    private void addSinks(GamePlayer gp, Salvoes salvo){
-        Integer contador = new Integer();
-        List<String> allCells = new ArrayList<>();
-        gp.getShip().forEach(ship -> {
-            allCells.addAll(ship.getLocations());
-            for (String cell: allCells) {
-                for (int i=0; i < salvo.getLocations().size(); i++){
-                    if (cell.equals(salvo.getLocations().get(i))){
-                        contador = contador +1;
-                    }
-                }
-            }
+    public void addSinks(GamePlayer gpNuestro){
+        Integer contador ;
+        contador =0;
+        GamePlayer gpEnemigo = getOponentGP(gpNuestro);
+        Set<Salvoes> salvos = gpNuestro.getSalvoes();
 
-                });
-        for (int i=0; i < allCells.size(); i++){
-            for (int j=0; j < salvo.getLocations().size(); j++){
-                if (allCells.get(i).equals(salvo.getLocations().get(j))) {
-                    salvo.setHits(allCells.get(i));
-                }
+        List<String> allCells = new ArrayList<>();
+        for (Salvoes salvo: salvos) {
+            allCells.addAll(salvo.getHits());
+        }
+        for (Ship ship:gpEnemigo.getShip()) {
+            if (allCells.containsAll(ship.getLocations())){
+                gpNuestro.setSinks(ship);
             }
         }
     }
@@ -320,6 +317,7 @@ public class AppController {
             dto.put("ships", gamePlayer.getShip().stream().map(Ship::shipDTO));
             dto.put("salvoes", gamePlayer.getGame().getGamePlayers().stream().flatMap(gp -> gp.getSalvoes().stream()
                     .map(Salvoes::salvoesDTO)));
+            //dto.put("sinks", gamePlayer.getSinks());
         }else
         { dto.put("ERROR", "no such game"); }
 
