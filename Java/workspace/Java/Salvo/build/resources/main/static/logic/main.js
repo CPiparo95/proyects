@@ -208,7 +208,7 @@ const app = new Vue({
                                 obj.tied ++
                             }else if (gp.score == 1.0){
                                 obj.win ++
-                            }  
+                            }
                         })
                         obj.total = obj.win + (obj.tied/2)
                         this.scores.push(obj)

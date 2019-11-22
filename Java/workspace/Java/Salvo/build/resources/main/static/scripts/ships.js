@@ -325,6 +325,24 @@ fetch("/api/game_view/" + params.get("gp"))
             }
         }
 
+        for (n = 0; n <= data.game_players.length - 1; n++) { //este for consulta el nombre del jugador
+            if (data.game_players[n].game_player_id == params.get("gp")) {
+            data.game_players[n].sinks.forEach(item => { //CARGA LOS BARCOS EN LA GRILLA
+                if (item.ship_positions[0].slice(1) == item.ship_positions[1].slice(1)) {
+                    createShips(item.ship_type, item.ship_positions.length,
+                        'vertical', document.getElementById('salvo' + item.ship_positions[0]), true)
+                } else {
+                    if (item.ship_positions[0].length > 2) {
+                        createShips(item.ship_type, item.ship_positions.length,
+                            'horizontal', document.getElementById('salvo' + item.ship_positions[1]), true)
+                    }
+                    createShips(item.ship_type, item.ship_positions.length,
+                        'horizontal', document.getElementById('salvo' + item.ship_positions[0]), true)
+                    }
+                })
+            }
+        }
+
         //ESTE FOR GIGANTE MANDA LOS SALVOS QUE NOSOTROS DISPARAMOS CON ANTERIORIDAD + hits
         for (n = 0; n <= data.game_players.length - 1; n++) { //este for consulta el nombre del jugador
             if (data.game_players[n].game_player_id == params.get("gp")) {

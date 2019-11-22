@@ -37,6 +37,8 @@ public class GamePlayer {
 
     private LocalDateTime joinTime;
 
+    private String state;
+
     private Boolean host;
 
     public GamePlayer(){}
@@ -46,6 +48,14 @@ public class GamePlayer {
         this.player = player;
         this.game = game;
         this.joinTime = joinTime;
+    }
+
+    public GamePlayer(Player player, Game game, LocalDateTime joinTime, Boolean host, String state){
+        this.host = host;
+        this.player = player;
+        this.game = game;
+        this.joinTime = joinTime;
+        this.state = state;
     }
 
     public Map<String, Object> gameDTO(){
@@ -119,13 +129,11 @@ public class GamePlayer {
         return this.joinTime;
     }
 
-    public String convertToNormalTime (LocalDateTime joinTime){
+    private String convertToNormalTime (LocalDateTime joinTime){
 
         DateTimeFormatter formateador = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 
-        String formatDateTime = joinTime.format(formateador);
-
-        return formatDateTime;
+        return joinTime.format(formateador);
     }
 
     public Set<Ship> getSinks() {
@@ -142,5 +150,13 @@ public class GamePlayer {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 }

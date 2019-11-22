@@ -62,7 +62,7 @@ public class SalvoApplication {
             GamePlayer relacion8 = gamePlayerRepository.save(new GamePlayer(player3, juego04, LocalDateTime.now(), false));
 
             Score score1 = scoreRepository.save(new Score(player3, juego04, LocalDateTime.now(), 1.0));
-            Score score2 = scoreRepository.save(new Score(player2, juego04, LocalDateTime.now(), 1.0));
+            Score score2 = scoreRepository.save(new Score(player2, juego04, LocalDateTime.now(), 0.0));
             Score score3 = scoreRepository.save(new Score(player4, juego03, LocalDateTime.now(), 0.5));
             Score score4 = scoreRepository.save(new Score(player5, juego03, LocalDateTime.now(), 0.5));
 

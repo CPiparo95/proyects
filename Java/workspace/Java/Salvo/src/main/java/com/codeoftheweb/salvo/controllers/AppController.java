@@ -8,10 +8,12 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import sun.awt.X11.XStateProtocol;
 
 import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.*;
 
 @RestController
@@ -39,6 +41,9 @@ public class AppController {
 
     @Autowired
     private SalvoesRepository salvoesRepo;
+
+    @Autowired
+    private ScoreRepository scoreRepo;
 
     //POST PARA CREAR PLAYERS
     @RequestMapping(value = "/players", method = RequestMethod.POST)
@@ -88,6 +93,7 @@ public class AppController {
                 return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
             } else {
                 GamePlayer newgp = new GamePlayer(player, game, LocalDateTime.now(), false);
+                newgp.setState("creacion de barcos");
                 gamePlayerRepo.save(newgp);
                 dto.put("Success", "Te has unido al juego correctamente");
                 return new ResponseEntity<>(dto, HttpStatus.CREATED);
@@ -109,7 +115,8 @@ public class AppController {
         Player player = playerRepo.findByUsername(authentication.getName());
         Game game = gameRepo.save(new Game(LocalDateTime.now()));
 
-        gp = gamePlayerRepo.save(new GamePlayer(player, game, game.getCreationTime(), true));
+        GamePlayer gp = gamePlayerRepo.save(new GamePlayer(player, game, game.getCreationTime(),
+                true, "creacion de barcos"));
         dto.put(" Success ", " El juego ha sido creado, y usted se ha unido a el");
         dto.put("gamePlayerID", gp.getId());
         return new ResponseEntity<>(dto, HttpStatus.CREATED);
@@ -132,7 +139,10 @@ public class AppController {
             if (gp == null) {
                 dto.put("Error", "This game does not exist!");
                 return new ResponseEntity<>(dto, HttpStatus.NOT_FOUND);
-            } else if (gp.getPlayer().getId() != player.getId()) {
+            }else if (!gp.getState().equals("creacion de barcos")) {
+                dto.put("Error", "you cannot create ships!");
+                return new ResponseEntity<>(dto, HttpStatus.UNAUTHORIZED);
+            }else if (gp.getPlayer().getId() != player.getId()) {
                 dto.put("Error", "You are not playing this game!");
                 return new ResponseEntity<>(dto, HttpStatus.UNAUTHORIZED);
             } else if (gp.getShip().size() > 0) {
@@ -153,6 +163,8 @@ public class AppController {
                     return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
                 } else {
                     ships.forEach(gp::addShip);
+
+                    gp.setState("Envio de salvos");
 
                     gamePlayerRepo.save(gp);
 
@@ -181,7 +193,10 @@ public class AppController {
             if (gp == null) {
                 dto.put("Error", "This game does not exist!");
                 return new ResponseEntity<>(dto, HttpStatus.NOT_FOUND);
-            } else if (gp.getPlayer().getId() != player.getId()) {
+            }else if (!gp.getState().equals("Envio de salvos")) { //STATE
+                dto.put("Error", "You are not playing this game!");
+                return new ResponseEntity<>(dto, HttpStatus.UNAUTHORIZED);
+            }else if (gp.getPlayer().getId() != player.getId()) {
                 dto.put("Error", "You are not playing this game!");
                 return new ResponseEntity<>(dto, HttpStatus.UNAUTHORIZED);
             } else if (gp.getSalvoes().stream().anyMatch(salvo -> salvo.getTurn() == salvoes.getTurn())) {
@@ -206,11 +221,19 @@ public class AppController {
             addHits(salvoes, gp);//AGREGA LOS HITS A BARCOS
             gp.addSalvoes(salvoes);//AGREGA LOS SALVOS A LA RELACION
             addSinks(gp);//AGREGA LOS SINKS EN GAMEPLAYER
+            GamePlayer contraryGp = getOponentGP(gp);
 
-            gamePlayerRepo.save(gp);
-
-            dto.put("Success", "Salvoes have been fired!");
-            return new ResponseEntity<>(dto, HttpStatus.CREATED);
+            gp.setState("Espera");
+            contraryGp.setState("Envio de salvos");
+                gamePlayerRepo.save(gp);
+                gamePlayerRepo.save(contraryGp);
+            if (isEnd(gp,contraryGp)){
+                dto.put("End", "The game is finished!");
+                return new ResponseEntity<>(dto, HttpStatus.I_AM_A_TEAPOT);
+            }else {
+                dto.put("Success", "Salvoes have been fired!");
+                return new ResponseEntity<>(dto, HttpStatus.CREATED);
+            }
         }
     }
 }
@@ -317,7 +340,6 @@ public class AppController {
             dto.put("ships", gamePlayer.getShip().stream().map(Ship::shipDTO));
             dto.put("salvoes", gamePlayer.getGame().getGamePlayers().stream().flatMap(gp -> gp.getSalvoes().stream()
                     .map(Salvoes::salvoesDTO)));
-            //dto.put("sinks", gamePlayer.getSinks());
         }else
         { dto.put("ERROR", "no such game"); }
 
@@ -328,6 +350,43 @@ public class AppController {
     private boolean isGuest(Authentication authentication) {
         return authentication == null || authentication instanceof AnonymousAuthenticationToken;
     }
+
+    private boolean isEnd(GamePlayer myGp, GamePlayer contraryGp){
+        if(myGp.getSalvoes().size() == contraryGp.getSalvoes().size()){
+            if (gp.getSinks().size() == 5 && contraryGp.getSinks().size() != 5){
+                scoreRepo.save(new Score(gp.getPlayer(),gp.getGame(),LocalDateTime.now(), 1.0));
+                scoreRepo.save(new Score(contraryGp.getPlayer(),gp.getGame(),LocalDateTime.now(), 0.0));
+                gp.setState("Ganaste");
+                contraryGp.setState("Perdiste");
+                gamePlayerRepo.save(gp);
+                gamePlayerRepo.save(contraryGp);
+                return true;
+            }else if (gp.getSinks().size() == 5 && contraryGp.getSinks().size() == 5){
+                scoreRepo.save(new Score(gp.getPlayer(),gp.getGame(),LocalDateTime.now(), 0.5));
+                scoreRepo.save(new Score(contraryGp.getPlayer(),gp.getGame(),LocalDateTime.now(), 0.5));
+                gp.setState("Empataste, verguenza.");
+                contraryGp.setState("Empataste, Verguenza.");
+                gamePlayerRepo.save(gp);
+                gamePlayerRepo.save(contraryGp);
+                return true;
+            }
+            else if (gp.getSinks().size() != 5 && contraryGp.getSinks().size() == 5){
+                scoreRepo.save(new Score(gp.getPlayer(),gp.getGame(),LocalDateTime.now(), 0.0));
+                scoreRepo.save(new Score(contraryGp.getPlayer(),gp.getGame(),LocalDateTime.now(), 1.0));
+                gp.setState("Perdiste");
+                contraryGp.setState("Ganaste");
+                gamePlayerRepo.save(gp);
+                gamePlayerRepo.save(contraryGp);
+                return true;
+
+            }else{
+                return false;
+            }
+        }else{
+         return false;
+        }
+    }
+
 
     //Metodos especificos para las funciones
     private boolean isOutOfRange(Ship ship){
