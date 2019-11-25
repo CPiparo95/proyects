@@ -2,7 +2,6 @@
 <html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="refresh" content="10" />
         <link rel="stylesheet" href="styles/normalize.css" />
         <link rel="stylesheet" href="styles/style.css" />
         <title>Battleship Grid</title>
@@ -13,19 +12,20 @@
                 <nav style="border: 2px solid black; ">
                     <ul style="list-style-type: none; display: flex; justify-content: space-around;">
                       <li><button type="button"><a @click="logOut">Log Out</a></button></li>
-                      <li><button v-if="shipsPositioned == false" id="collect-boats" type="button"> guardar posiciones barcos </button> </li>
+                      <li><button v-show="state == 'creacion de barcos' " id="collect-boats" type="button"> guardar posiciones barcos </button> </li>
                       <li><button type="button"> <a href="index.html"> Return to games </a></button> </li>
-                      <li><button v-if="salvoesFired == false && shipsPositioned == true" type="button"> <a onClick="sendSalvoes();"> send Salvos </a> </button> </li>
+                      <li><button v-show="state == 'Envio de salvos' " type="button"> <a onClick="sendSalvoes();"> send Salvos </a> </button> </li>
                     </ul>
                 </nav>
             </div>    
             <div>
                 <div>
                     <H1 style="text-align: left;">TURNO: {{turno}}</H1>
-                    <H1 style="text-align: center;" v-if="shipsPositioned == false">FASE DE COLOCACION DE BARCOS</H1>
-                    <H1 style="text-align: center;" v-if="shipsPositioned == true">FASE DE DISPARO DE SALVOS</H1>
+                    <H1 style="text-align: center;" v-if="state == 'creacion de barcos' ">FASE DE COLOCACION DE BARCOS</H1>
+                    <H1 style="text-align: center;" v-if="state == 'Envio de salvos' ">FASE DE DISPARO DE SALVOS</H1>
+                    <H1 style="text-align: center;" v-if="state == 'Espera' ">FASE DE ESPERAMIENTO A LOS DISPARIOS ENIEMIGOS</H1>
                 </div>
-                <H3 style="text-align: center;" v-if="shipsPositioned == true">Posiciones a disparar: {{salvoesPositionsNotFire}}</H3>
+                <H3 style="text-align: center;" v-if="state == 'Envio de salvos' ">Posiciones a disparar: {{salvoesPositionsNotFire}}</H3>
             </div>
         </div>
     <div class="flex-container">

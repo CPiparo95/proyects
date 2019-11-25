@@ -166,7 +166,7 @@ const app = new Vue({
                                                 </button>
                                             </td>
 
-                                            <td v-for="gp in game.game_players" v-show="app.user_active == true" >
+                                            <td v-for="gp in game.game_players" v-show="gp.state != 'Ganaste' || gp.state != 'Perdiste' || gp.state != 'Empataste, Verguenza.' " >
                                                 <button type="button" class="btn btn-primary"
                                                 v-if="gp.player.user_name == userdata.player.user_name">
                                                     <a @click="goToGame(gp.game_player_id)"> Go to the game </a>

@@ -207,11 +207,18 @@ var params = new URLSearchParams(window.location.search)
 let salvoArray = []
 var ships = ['gaucho1', 'gaucho2', 'gaucho3', 'gaucho4', 'gaucho5'];
 var shipsLocated = []
+
+arranqueGrillas()
+
+setInterval(refillGrille, 10000)
+
 document.getElementById("collect-boats").addEventListener("click", function () {
+    console.log("se creo el evento")
     getShips();
 });
 
 function getShips() {
+    console.log("entro a getShips")
     for (let i = 0; i < ships.length; i++) {
         let shipObject = {
             type: "",
@@ -291,7 +298,6 @@ function sendSalvoes() {
             })
             .then(json => {
                 alert(JSON.stringify(json));
-                app.salvoesFired = true
                 window.location.reload(true)
             })
             .catch(ex => console.log(ex));
@@ -300,8 +306,9 @@ function sendSalvoes() {
     }
 }
 
-//fetch para cargar tanto salvos como barcos, tambien indica la fase y el turno
-fetch("/api/game_view/" + params.get("gp"))
+function refillGrille(){
+    //fetch para cargar tanto salvos como barcos, tambien indica la fase y el turno
+    fetch("/api/game_view/" + params.get("gp"))
     .then(function (response) {
         return response.json()
     })
@@ -309,143 +316,191 @@ fetch("/api/game_view/" + params.get("gp"))
         console.log(json)
         data = json.data
 
-        //DETECTA EL TURNO EN BASE A LA CANTIDAD DE SALVOS Y LO GUARDA EN app.turno
-        let parImpar = (data.salvoes.length % 2) ? "impar" : "par"
-        if (parImpar == "par") {
-            app.turno = (data.salvoes.length / 2) + 1
-        } else {
-            app.turno = ((data.salvoes.length - 1) / 2) + 1
-        }
+        cargaFinJuegoyDeclaraEstado(data)
+        
+        cargarTurno(data)
 
-        for (n = 0; n <= data.game_players.length - 1; n++) {
-            if (data.game_players[n].game_player_id == params.get("gp")) {
-                data.game_players[n].sinks.forEach(sink => {
+        cargarBarcosQueHundimos(data)
 
-                });
-            }
-        }
+        salvosDisparadosyHits(data)
 
-        for (n = 0; n <= data.game_players.length - 1; n++) { //este for consulta el nombre del jugador
-            if (data.game_players[n].game_player_id == params.get("gp")) {
-            data.game_players[n].sinks.forEach(item => { //CARGA LOS BARCOS EN LA GRILLA
-                if (item.ship_positions[0].slice(1) == item.ship_positions[1].slice(1)) {
-                    createShips(item.ship_type, item.ship_positions.length,
-                        'vertical', document.getElementById('salvo' + item.ship_positions[0]), true)
-                } else {
-                    if (item.ship_positions[0].length > 2) {
-                        createShips(item.ship_type, item.ship_positions.length,
-                            'horizontal', document.getElementById('salvo' + item.ship_positions[1]), true)
-                    }
-                    createShips(item.ship_type, item.ship_positions.length,
-                        'horizontal', document.getElementById('salvo' + item.ship_positions[0]), true)
-                    }
-                })
-            }
-        }
+        salvosQueNosTiraron(data)
 
-        //ESTE FOR GIGANTE MANDA LOS SALVOS QUE NOSOTROS DISPARAMOS CON ANTERIORIDAD + hits
-        for (n = 0; n <= data.game_players.length - 1; n++) { //este for consulta el nombre del jugador
-            if (data.game_players[n].game_player_id == params.get("gp")) {
-                for (h = 0; h <= data.salvoes.length - 1; h++) { //este for comprueba que estemos en los salvos del jugador correcto
-                    if (data.game_players[n].player.user_name == data.salvoes[h].player_username) {
-                        if (data.salvoes[h].hits != undefined) {
-                            for (j = 0; j < data.salvoes[h].hits.length; j++) {
-                                let shot = document.createElement("img");
-                                shot.setAttribute("src", "assets/ships/explosion.gif");
-                                shot.style.zIndex = 10;
-                                shot.style.width = "30px";
-                                shot.style.height = "30px";
-                                shot.style.margin = "2.5px";
-                                shot.style.position = "absolute";
-                                document.getElementById("salvo" + data.salvoes[h].hits[j]).appendChild(shot);
-                                app.salvoesPositionsFire.push(data.salvoes[h].hits[j])
-                            }
-
-                            for (l = 0; l <= data.salvoes[h].fire_positions.length - 1; l++) { //finalmente crea salvoes por cada jugador
-                                    if (data.salvoes[h].hits.includes(data.salvoes[h].fire_positions[l])) {
-                                    }else{
-                                        let shot = document.createElement("img");
-                                        shot.setAttribute("src", "assets/ships/explosion_agua.jpg");
-                                        shot.style.zIndex = 10;
-                                        shot.style.width = "30px";
-                                        shot.style.height = "30px";
-                                        shot.style.margin = "2.5px";
-                                        shot.style.position = "absolute";
-                                        document.getElementById("salvo" + data.salvoes[h].fire_positions[l]).appendChild(shot);
-                                        app.salvoesPositionsFire.push(data.salvoes[h].fire_positions[l])
-                                        if (app.salvoesPositionsFire.length >= 5 * (app.turno + 1)) {
-                                            app.salvoesFired = true
-                                        }
-                                    }
-                                }
-
-                        } else {
-                            for (l = 0; l <= data.salvoes[h].fire_positions.length - 1; l++) { //finalmente crea salvoes por cada jugador
-                                let shot = document.createElement("img");
-                                shot.setAttribute("src", "assets/ships/explosion_agua.jpg");
-                                shot.style.zIndex = 10;
-                                shot.style.width = "30px";
-                                shot.style.height = "30px";
-                                shot.style.margin = "2.5px";
-                                shot.style.position = "absolute";
-                                document.getElementById("salvo" + data.salvoes[h].fire_positions[l]).appendChild(shot);
-                                app.salvoesPositionsFire.push(data.salvoes[h].fire_positions[l])
-                                if (app.salvoesPositionsFire.length >= 5 * (app.turno + 1)) {
-                                    app.salvoesFired = true
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-
-        //CARGA LOS BARCOS
-        if (data.ships.length == 5) {
-            app.shipsPositioned = true //CAMBIA EL TITULO, osea, LA FASE
-            data.ships.forEach(item => { //CARGA LOS BARCOS EN LA GRILLA
-                if (item.ship_positions[0].slice(1) == item.ship_positions[1].slice(1)) {
-                    createShips(item.ship_type, item.ship_positions.length,
-                        'vertical', document.getElementById('ships' + item.ship_positions[0]), true)
-                } else {
-                    if (item.ship_positions[0].length > 2) {
-                        createShips(item.ship_type, item.ship_positions.length,
-                            'horizontal', document.getElementById('ships' + item.ship_positions[1]), true)
-                    }
-                    createShips(item.ship_type, item.ship_positions.length,
-                        'horizontal', document.getElementById('ships' + item.ship_positions[0]), true)
-                }
-
-            })
-            //CARGA LOS SALVOS QUE NOS TIRARON A NOSOTROS
-            for (n = 0; n <= data.game_players.length - 1; n++) { //este for consulta el nombre del jugador
-                if (data.game_players[n].game_player_id != params.get("gp")) {
-                    for (h = 0; h <= data.salvoes.length - 1; h++) { //este for comprueba que estemos en los salvos del jugador correcto
-                        if (data.game_players[n].player.user_name == data.salvoes[h].player_username) {
-                            for (l = 0; l <= data.salvoes[h].fire_positions.length - 1; l++) { //finalmente crea salvoes por cada jugador
-                                let shot = document.createElement("img");
-                                shot.setAttribute("src", "assets/ships/explosion.gif");
-                                shot.style.zIndex = 10;
-                                shot.style.width = "30px";
-                                shot.style.height = "30px";
-                                shot.style.margin = "2.5px";
-                                shot.style.position = "absolute";
-                                document.getElementById("ships" + data.salvoes[h].fire_positions[l]).appendChild(shot);
-                            }
-                        }
-                    }
-                }
-            }
-            //CARGA LOS BARCOS EN CASO DE QUE NO LOS HAYAMOS COLOCADO
-        } else {
-            createShips('gaucho1', 5, 'horizontal', document.getElementById('dock'), false)
-            createShips('gaucho2', 4, 'horizontal', document.getElementById('dock'), false)
-            createShips('gaucho3', 3, 'horizontal', document.getElementById('dock'), false)
-            createShips('gaucho4', 3, 'horizontal', document.getElementById('dock'), false)
-            createShips('gaucho5', 2, 'horizontal', document.getElementById('dock'), false)
-        }
     })
     .catch(function (error) {
         console.log(error)
     })
+}
+
+function arranqueGrillas(){
+    //fetch para cargar tanto salvos como barcos, tambien indica la fase y el turno
+    fetch("/api/game_view/" + params.get("gp"))
+    .then(function (response) {
+        return response.json()
+    })
+    .then(json => {
+        console.log(json)
+        data = json.data
+
+        cargaFinJuegoyDeclaraEstado(data)
+        
+        cargarTurno(data)
+
+        cargarBarcosQueHundimos(data)
+
+        salvosDisparadosyHits(data)
+
+        cargarBarcos(data)
+
+        salvosQueNosTiraron(data)
+
+    })
+    .catch(function (error) {
+        console.log(error)
+    })
+}
+
+function cargarBarcos(data){
+    if (data.ships.length == 5) {
+        data.ships.forEach(item => { //CARGA LOS BARCOS EN LA GRILLA
+            if (item.ship_positions[0].slice(1) == item.ship_positions[1].slice(1)) {
+                createShips(item.ship_type, item.ship_positions.length,
+                    'vertical', document.getElementById('ships' + item.ship_positions[0]), true)
+            } else {
+                if (item.ship_positions[0].length > 2) {
+                    createShips(item.ship_type, item.ship_positions.length,
+                        'horizontal', document.getElementById('ships' + item.ship_positions[1]), true)
+                }
+                createShips(item.ship_type, item.ship_positions.length,
+                    'horizontal', document.getElementById('ships' + item.ship_positions[0]), true)
+            }
+
+        })
+        //CARGA LOS BARCOS EN CASO DE QUE NO LOS HAYAMOS COLOCADO
+    } else {
+        createShips('gaucho1', 5, 'horizontal', document.getElementById('dock'), false)
+        createShips('gaucho2', 4, 'horizontal', document.getElementById('dock'), false)
+        createShips('gaucho3', 3, 'horizontal', document.getElementById('dock'), false)
+        createShips('gaucho4', 3, 'horizontal', document.getElementById('dock'), false)
+        createShips('gaucho5', 2, 'horizontal', document.getElementById('dock'), false)
+    }
+}
+
+function cargaFinJuegoyDeclaraEstado(data){
+    for (n = 0; n < data.game_players.length ; n++) { //este for consulta el nombre del jugador
+        if (data.game_players[n].game_player_id == params.get("gp")) {
+            app.state = data.game_players[n].state
+            if (data.game_players[n].state == "Ganaste" || data.game_players[n].state == "Perdiste" || data.game_players[n].state == "Empataste, Verguenza."){
+                window.location.assign("index.html")//SI EL JUEGO TERMINO, LO DEVUELVE A LA PANTALLA DE INICIO
+            }
+        }
+    }
+}
+
+function salvosQueNosTiraron(data){
+        //CARGA LOS SALVOS QUE NOS TIRARON A NOSOTROS
+        for (n = 0; n < data.game_players.length ; n++) { //este for consulta el nombre del jugador
+            if (data.game_players[n].game_player_id != params.get("gp")) {
+                for (h = 0; h < data.salvoes.length ; h++) { //este for comprueba que estemos en los salvos del jugador correcto
+                    if (data.game_players[n].player.user_name == data.salvoes[h].player_username) {
+                        for (l = 0; l < data.salvoes[h].fire_positions.length; l++) { //finalmente crea salvoes por cada jugador
+                            let shot = document.createElement("img");
+                            shot.setAttribute("src", "assets/ships/explosion.gif");
+                            shot.style.zIndex = 10;
+                            shot.style.width = "30px";
+                            shot.style.height = "30px";
+                            shot.style.margin = "2.5px";
+                            shot.style.position = "absolute";
+                            document.getElementById("ships" + data.salvoes[h].fire_positions[l]).appendChild(shot);
+                        }
+                    }
+                }
+            }
+        }
+}
+
+function cargarTurno(data){
+    //DETECTA EL TURNO EN BASE A LA CANTIDAD DE SALVOS Y LO GUARDA EN app.turno
+    let parImpar = (data.salvoes.length % 2) ? "impar" : "par"
+    if (parImpar == "par") {
+        app.turno = (data.salvoes.length / 2) + 1
+    } else {
+        app.turno = ((data.salvoes.length - 1) / 2) + 1
+    }
+}
+
+function cargarBarcosQueHundimos(data){
+    for (n = 0; n < data.game_players.length ; n++) { //este for consulta el nombre del jugador
+        if (data.game_players[n].game_player_id == params.get("gp")) {
+        data.game_players[n].sinks.forEach(item => { //CARGA LOS BARCOS QUE NOSOTROS HUNDIMOS
+            if (item.ship_positions[0].slice(1) == item.ship_positions[1].slice(1)) {
+                createShips(item.ship_type, item.ship_positions.length,
+                    'vertical', document.getElementById('salvo' + item.ship_positions[0]), true)
+            } else {
+                if (item.ship_positions[0].length > 2) {
+                    createShips(item.ship_type, item.ship_positions.length,
+                        'horizontal', document.getElementById('salvo' + item.ship_positions[1]), true)
+                }
+                createShips(item.ship_type, item.ship_positions.length,
+                    'horizontal', document.getElementById('salvo' + item.ship_positions[0]), true)
+                }
+            })
+        }
+    }
+}
+function salvosDisparadosyHits(data){
+    //ESTE FOR GIGANTE MANDA LOS SALVOS QUE NOSOTROS DISPARAMOS CON ANTERIORIDAD + hits
+    for (n = 0; n < data.game_players.length ; n++) { //este for consulta el nombre del jugador
+        if (data.game_players[n].game_player_id == params.get("gp")) {
+            for (h = 0; h < data.salvoes.length ; h++) { //este for comprueba que estemos en los salvos del jugador correcto
+                if (data.game_players[n].player.user_name == data.salvoes[h].player_username) {
+                    if (data.salvoes[h].hits != undefined) {
+                        for (j = 0; j < data.salvoes[h].hits.length; j++) {
+                            let shot = document.createElement("img");
+                            shot.setAttribute("src", "assets/ships/explosion.gif");
+                            shot.style.zIndex = 10;
+                            shot.style.width = "30px";
+                            shot.style.height = "30px";
+                            shot.style.margin = "2.5px";
+                            shot.style.position = "absolute";
+                            document.getElementById("salvo" + data.salvoes[h].hits[j]).appendChild(shot);
+                            app.salvoesPositionsFire.push(data.salvoes[h].hits[j])
+                        }
+
+                        for (l = 0; l < data.salvoes[h].fire_positions.length; l++) { //finalmente crea salvoes por cada jugador
+                                if (data.salvoes[h].hits.includes(data.salvoes[h].fire_positions[l])) {
+                                }else{
+                                    let shot = document.createElement("img");
+                                    shot.setAttribute("src", "assets/ships/explosion_agua.jpg");
+                                    shot.style.zIndex = 10;
+                                    shot.style.width = "30px";
+                                    shot.style.height = "30px";
+                                    shot.style.margin = "2.5px";
+                                    shot.style.position = "absolute";
+                                    document.getElementById("salvo" + data.salvoes[h].fire_positions[l]).appendChild(shot);
+                                    app.salvoesPositionsFire.push(data.salvoes[h].fire_positions[l])
+                                    if (app.salvoesPositionsFire.length >= 5 * (app.turno + 1)) {
+                                    }
+                                }
+                            }
+
+                    } else {
+                        for (l = 0; l < data.salvoes[h].fire_positions.length ; l++) { //finalmente crea salvoes por cada jugador
+                            let shot = document.createElement("img");
+                            shot.setAttribute("src", "assets/ships/explosion_agua.jpg");
+                            shot.style.zIndex = 10;
+                            shot.style.width = "30px";
+                            shot.style.height = "30px";
+                            shot.style.margin = "2.5px";
+                            shot.style.position = "absolute";
+                            document.getElementById("salvo" + data.salvoes[h].fire_positions[l]).appendChild(shot);
+                            app.salvoesPositionsFire.push(data.salvoes[h].fire_positions[l])
+                            if (app.salvoesPositionsFire.length >= 5 * (app.turno + 1)) {
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -232,7 +232,7 @@ public class AppController {
                 gamePlayerRepo.save(gp);
                 gamePlayerRepo.save(contraryGp);
             if (isEnd(gp,contraryGp)){
-                dto.put("End", "The game is finished!");
+                dto.put("End", "The game is finished!" + gp.getState());
                 return new ResponseEntity<>(dto, HttpStatus.I_AM_A_TEAPOT);
             }else {
                 dto.put("Success", "Salvoes have been fired!");

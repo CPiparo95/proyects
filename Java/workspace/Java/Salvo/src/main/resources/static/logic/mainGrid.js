@@ -1,8 +1,7 @@
 const app = new Vue({
     el: '#app',
     data: {
-        shipsPositioned: false,
-        salvoesFired: false,
+        state: "",
         salvoesPositionsNotFire: [],
         salvoesPositionsFire: [],
         turno : 0
