@@ -206,7 +206,7 @@ let data = {}
 var params = new URLSearchParams(window.location.search)
 let salvoArray = []
 var ships = ['gaucho1', 'gaucho2', 'gaucho3', 'gaucho4', 'gaucho5'];
-var shipsLocated = [];
+var shipsLocated = []
 document.getElementById("collect-boats").addEventListener("click", function () {
     getShips();
 });

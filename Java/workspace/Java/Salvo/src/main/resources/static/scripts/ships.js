@@ -206,7 +206,7 @@ let data = {}
 var params = new URLSearchParams(window.location.search)
 let salvoArray = []
 var ships = ['gaucho1', 'gaucho2', 'gaucho3', 'gaucho4', 'gaucho5'];
-var shipsLocated = [];
+var shipsLocated = []
 document.getElementById("collect-boats").addEventListener("click", function () {
     getShips();
 });
@@ -309,20 +309,21 @@ fetch("/api/game_view/" + params.get("gp"))
         console.log(json)
         data = json.data
 
+        for (n = 0; n <= data.game_players.length - 1; n++) { //este for consulta el nombre del jugador
+            if (data.game_players[n].game_player_id != params.get("gp")) {
+                if (data.game_players[n].state == "Ganaste" || data.game_players[n].state == "Perdiste" || data.game_players[n].state == "Empataste, Verguenza."){
+                    window.location.assign("index.html")//SI EL JUEGO TERMINO, LO DEVUELVE A LA PANTALLA DE INICIO
+                }
+            }
+        }
+        
+
         //DETECTA EL TURNO EN BASE A LA CANTIDAD DE SALVOS Y LO GUARDA EN app.turno
         let parImpar = (data.salvoes.length % 2) ? "impar" : "par"
         if (parImpar == "par") {
             app.turno = (data.salvoes.length / 2) + 1
         } else {
             app.turno = ((data.salvoes.length - 1) / 2) + 1
-        }
-
-        for (n = 0; n <= data.game_players.length - 1; n++) {
-            if (data.game_players[n].game_player_id == params.get("gp")) {
-                data.game_players[n].sinks.forEach(sink => {
-
-                });
-            }
         }
 
         for (n = 0; n <= data.game_players.length - 1; n++) { //este for consulta el nombre del jugador

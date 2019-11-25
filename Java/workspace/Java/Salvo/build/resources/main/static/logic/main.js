@@ -226,7 +226,7 @@ const app = new Vue({
                                         <tr>
                                             <th scope="col">User ID</th>
                                             <th scope="col">User Name</th>
-                                            <th scope="col">Total</th>
+                                            <th scope="col">Total Points</th>
                                             <th scope="col">Won</th>
                                             <th scope="col">Lost</th>
                                             <th scope="col">Tied</th>

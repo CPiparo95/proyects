@@ -64,6 +64,7 @@ public class GamePlayer {
         dto.put("join_time", this.convertToNormalTime(getJoinTime()));
         dto.put("is_host",this.getHost());
         dto.put("game", this.getGame().gameDTO());
+        dto.put("state", this.getState());
 
         Score score = this.getGame().getScoreByPlayer(this.getPlayer());
         if (score != null){
@@ -79,6 +80,7 @@ public class GamePlayer {
         dto.put("game_player_id",this.id);
         dto.put("join_time", this.convertToNormalTime(getJoinTime()));
         dto.put("is_host",this.getHost());
+        dto.put("state", this.getState());
         dto.put("player", this.getPlayer().playerDTO());
         dto.put("sinks",this.getSinks().stream().map(Ship::shipDTO));
 
