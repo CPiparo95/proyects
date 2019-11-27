@@ -238,6 +238,27 @@ function getShips() {
     sendToBackend()
 }
 
+function getShipsDestroyed() {
+    console.log("entro a getShips")
+    for (let i = 0; i < ships.length; i++) {
+        let shipObject = {
+            type: "",
+            locations: []
+        }
+        let ship = document.getElementById(ships[i]);
+        if (ship.dataset.y != undefined && ship.dataset.x != undefined) {
+            shipObject.type = ship.id;
+
+            let config = document.getElementsByClassName(`${ships[i]}-busy-cell`);
+            for (let i = 0; i < config.length; i++) {
+                shipObject.locations.push(config[i].dataset.y + config[i].dataset.x);
+            }
+            shipsLocated.push(shipObject);
+        }
+    }
+
+}
+
 function sendToBackend() {
     if (shipsLocated.length == 5) {
         fetch("/api/placeShips/" + params.get("gp"), {
@@ -448,6 +469,7 @@ function cargarBarcosQueHundimos(data){
         }
     }
 }
+
 function salvosDisparadosyHits(data){
     //ESTE FOR GIGANTE MANDA LOS SALVOS QUE NOSOTROS DISPARAMOS CON ANTERIORIDAD + hits
     for (n = 0; n < data.game_players.length ; n++) { //este for consulta el nombre del jugador

@@ -31,10 +31,6 @@ public class GamePlayer {
     @JoinColumn(name="game_id")
     private Game game;
 
-    @ElementCollection
-    @Column(name = "sinks")
-    private Set<Ship> sinks;
-
     private LocalDateTime joinTime;
 
     private String state;
@@ -65,6 +61,7 @@ public class GamePlayer {
         dto.put("is_host",this.getHost());
         dto.put("game", this.getGame().gameDTO());
         dto.put("state", this.getState());
+        dto.put("sinks",this.getSinks(this).stream().map(Ship::shipDTO));
 
         Score score = this.getGame().getScoreByPlayer(this.getPlayer());
         if (score != null){
@@ -82,7 +79,7 @@ public class GamePlayer {
         dto.put("is_host",this.getHost());
         dto.put("state", this.getState());
         dto.put("player", this.getPlayer().playerDTO());
-        dto.put("sinks",this.getSinks().stream().map(Ship::shipDTO));
+        dto.put("sinks",this.getSinks(this).stream().map(Ship::shipDTO));
 
         Score score = this.getPlayer().getScoreByGame(this.getGame());
         if (score != null){
@@ -138,14 +135,6 @@ public class GamePlayer {
         return joinTime.format(formateador);
     }
 
-    public Set<Ship> getSinks() {
-        return sinks;
-    }
-
-    public void setSinks(Ship sink) {
-        this.sinks.add(sink);
-    }
-
     public long getId() {
         return id;
     }
@@ -158,7 +147,50 @@ public class GamePlayer {
         return state;
     }
 
+    public String getState() {
+        if (this.getSinks(this).size() == 5 && this.getSinks(getOponentGP(this)).size() == 5){
+            return "Empataste, verguenza.";
+        }else if (this.getSinks(this).size() == 5 && this.getSinks(getOponentGP(this)).size() != 5){
+            return "Ganaste";
+        }else if (this.getSinks(this).size() != 5 && this.getSinks(getOponentGP(this)).size() == 5) {
+            return "Perdiste, Verguenza.";
+        }else if (this.getShip().size() == 0) {
+            return "creacion de barcos";
+        }else if (this.getShip().size() == 5 && getOponentGP(this).getShip().size() == 0) {
+            return "Espera";
+        }else if (this.getShip().size() == 5 && getOponentGP(this).getShip().size() == 0) {
+            return "Espera";
+        }
+    }
+
     public void setState(String state) {
         this.state = state;
     }
+
+    public GamePlayer getOponentGP (GamePlayer myGP){
+        return myGP.getGame().getGamePlayers().stream().filter
+                (gpa -> gpa.getId() != myGP.getId()).findFirst().orElse(null);
+    }
+
+    //AGREGA LOS SINKS A SALVO
+    public Set<Ship> getSinks(GamePlayer gpNuestro){
+        Set <Ship> sinks = null;
+
+        GamePlayer gpEnemigo = getOponentGP(gpNuestro);
+        Set<Salvoes> salvos = gpNuestro.getSalvoes();
+
+        List<String> allCells = new ArrayList<>();
+        for (Salvoes salvo: salvos) {
+            allCells.addAll(salvo.getHits());
+        }
+        for (Ship ship:gpEnemigo.getShip()) {
+            if (allCells.containsAll(ship.getLocations())){
+                sinks.add(ship);
+            }
+        }
+        return sinks;
+    }
+
+
+
 }

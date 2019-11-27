@@ -22,10 +22,6 @@ public class Salvoes {
 
     private Integer turn;
 
-    @ElementCollection
-    @Column(name = "hits")
-    private List<String> hits = new ArrayList<>();
-
     public Salvoes() { }
 
     public Salvoes(Integer turn, List<String> locations) {
@@ -72,12 +68,21 @@ public class Salvoes {
         this.turn = turn;
     }
 
-    public List<String> getHits() {
-        return hits;
-    }
+    //AGREGA LOS HITS A SALVO
+    public List<String> getHits(){
+        List<String> allCells = new ArrayList<>();
+        getGamePlayer().getOponentGP(getGamePlayer()).getShip().forEach(ship -> allCells.addAll(ship.getLocations()));
 
-    public void setHits(String hits) {
-        this.hits.add(hits);
+        List<String> allSalvoCells = new ArrayList<>();
+
+        for (String allCell : allCells) {
+            for (int j = 0; j < getLocations().size(); j++) {
+                if (allCell.equals(getLocations().get(j))) {
+                    allSalvoCells.add(allCell);
+                }
+            }
+        }
+        return allSalvoCells;
     }
 
 }

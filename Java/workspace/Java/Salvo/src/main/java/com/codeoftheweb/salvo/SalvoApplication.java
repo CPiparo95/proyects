@@ -102,22 +102,18 @@ public class SalvoApplication {
 
             String[] salvoesFire01 = {"E1","A1","G10","H7", "C2", "B1", "C1", "D1"};
             String[] salvoesFire02 = {"E9","E5","A5", "B2", "I6"};
-            String[] salvoesFire03 = {"A2","F3","D8","B2", "E5"};
 
             Salvoes salvo01 = salvoesRepository.save(new Salvoes(Arrays.asList(salvoesFire01)));
             Salvoes salvo02 = salvoesRepository.save(new Salvoes(Arrays.asList(salvoesFire02)));
-            Salvoes salvo03 = salvoesRepository.save(new Salvoes(Arrays.asList(salvoesFire03)));
 
             relacion1.addSalvoes(salvo02);
             relacion2.addSalvoes(salvo01);
-            //relacion1.addSalvoes(salvo03);
 
             gamePlayerRepository.save(relacion1);
             gamePlayerRepository.save(relacion2);
             gamePlayerRepository.save(relacion3);
             gamePlayerRepository.save(relacion4);
             gamePlayerRepository.save(relacion5);
-            //controller1.addHits(relacion2, );
         };
     }
 }

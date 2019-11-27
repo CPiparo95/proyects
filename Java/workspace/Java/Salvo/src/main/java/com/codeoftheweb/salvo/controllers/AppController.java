@@ -140,7 +140,8 @@ public class AppController {
             if (gp == null) {
                 dto.put("Error", "This game does not exist!");
                 return new ResponseEntity<>(dto, HttpStatus.NOT_FOUND);
-            }else if (gp.getState().equals("Ganaste") || gp.getState().equals("Perdiste") || gp.getState().equals("Empataste, verguenza.")) { //STATE
+            }else if (gp.getState().equals("Ganaste") || gp.getState().equals("Perdiste") ||
+                    gp.getState().equals("Empataste, verguenza.")) { //STATE
                 dto.put("Error", "The game is finished, you cannot place ships in this game.");
                 return new ResponseEntity<>(dto, HttpStatus.UNAUTHORIZED);
             }else if (!gp.getState().equals("creacion de barcos")) {
@@ -222,9 +223,7 @@ public class AppController {
                 dto.put("Error", "you have to wait to you opponent to fire salvos!");
                 return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
             }else{
-            addHits(salvoes, gp);//AGREGA LOS HITS A BARCOS
             gp.addSalvoes(salvoes);//AGREGA LOS SALVOS A LA RELACION
-            addSinks(gp);//AGREGA LOS SINKS EN GAMEPLAYER
             GamePlayer contraryGp = getOponentGP(gp);
 
             gp.setState("Espera");
@@ -291,40 +290,6 @@ public class AppController {
         return this.playerViewDTO(playerRepo.findById(playerID).orElse(null));
     }
 
-    //AGREGA LOS HITS A SALVO -- ERROR, REPITE EL SALVO 2 VECES, CHEQUEAR CONTRA JACK EL PRIMER JUEGO, DISPARAR SOBRE C8
-    public void addHits(Salvoes salvo, GamePlayer gp){
-        List<String> allCells = new ArrayList<>();
-        gp = getOponentGP(gp);
-
-        gp.getShip().forEach(ship -> allCells.addAll(ship.getLocations()));
-
-        for (String allCell : allCells) {
-            for (int j = 0; j < salvo.getLocations().size(); j++) {
-                if (allCell.equals(salvo.getLocations().get(j))) {
-                    salvo.setHits(allCell);
-                }
-            }
-        }
-    }
-
-    //AGREGA LOS SINKS A SALVO
-    public void addSinks(GamePlayer gpNuestro){
-        Integer contador ;
-        contador =0;
-        GamePlayer gpEnemigo = getOponentGP(gpNuestro);
-        Set<Salvoes> salvos = gpNuestro.getSalvoes();
-
-        List<String> allCells = new ArrayList<>();
-        for (Salvoes salvo: salvos) {
-            allCells.addAll(salvo.getHits());
-        }
-        for (Ship ship:gpEnemigo.getShip()) {
-            if (allCells.containsAll(ship.getLocations())){
-                gpNuestro.setSinks(ship);
-            }
-        }
-    }
-
     //DTO
     private Map<String, Object> playerViewDTO (Player player){
         Map<String, Object> dto = new LinkedHashMap<>();
@@ -357,7 +322,7 @@ public class AppController {
 
     private boolean isEnd(GamePlayer myGp, GamePlayer contraryGp){
         if(myGp.getSalvoes().size() == contraryGp.getSalvoes().size()){
-            if (myGp.getSinks().size() == 5 && contraryGp.getSinks().size() != 5){
+            if (myGp.getSinks(myGp).size() == 5 && contraryGp.getSinks(contraryGp).size() != 5){
                 scoreRepo.save(new Score(myGp.getPlayer(),myGp.getGame(),LocalDateTime.now(), 1.0));
                 scoreRepo.save(new Score(contraryGp.getPlayer(),myGp.getGame(),LocalDateTime.now(), 0.0));
                 myGp.setState("Ganaste");
@@ -365,7 +330,7 @@ public class AppController {
                 gamePlayerRepo.save(myGp);
                 gamePlayerRepo.save(contraryGp);
                 return true;
-            }else if (myGp.getSinks().size() == 5 && contraryGp.getSinks().size() == 5){
+            }else if (myGp.getSinks(myGp).size() == 5 && contraryGp.getSinks(contraryGp).size() == 5){
                 scoreRepo.save(new Score(myGp.getPlayer(),myGp.getGame(),LocalDateTime.now(), 0.5));
                 scoreRepo.save(new Score(contraryGp.getPlayer(),myGp.getGame(),LocalDateTime.now(), 0.5));
                 myGp.setState("Empataste, verguenza.");
@@ -374,7 +339,7 @@ public class AppController {
                 gamePlayerRepo.save(contraryGp);
                 return true;
             }
-            else if (myGp.getSinks().size() != 5 && contraryGp.getSinks().size() == 5){
+            else if (myGp.getSinks(myGp).size() != 5 && contraryGp.getSinks(contraryGp).size() == 5){
                 scoreRepo.save(new Score(myGp.getPlayer(),myGp.getGame(),LocalDateTime.now(), 0.0));
                 scoreRepo.save(new Score(contraryGp.getPlayer(),myGp.getGame(),LocalDateTime.now(), 1.0));
                 myGp.setState("Perdiste");
