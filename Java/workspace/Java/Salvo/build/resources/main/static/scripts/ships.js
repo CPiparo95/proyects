@@ -207,13 +207,14 @@ var params = new URLSearchParams(window.location.search)
 let salvoArray = []
 var ships = ['gaucho1', 'gaucho2', 'gaucho3', 'gaucho4', 'gaucho5'];
 var shipsLocated = []
+let shipsDestroyed = []
+let filtrado = []
 
 arranqueGrillas()
 
 setInterval(refillGrille, 10000)
 
 document.getElementById("collect-boats").addEventListener("click", function () {
-    console.log("se creo el evento")
     getShips();
 });
 
@@ -411,7 +412,8 @@ function cargaFinJuegoyDeclaraEstado(data){
     for (n = 0; n < data.game_players.length ; n++) { //este for consulta el nombre del jugador
         if (data.game_players[n].game_player_id == params.get("gp")) {
             app.state = data.game_players[n].state
-            if (data.game_players[n].state == "Ganaste" || data.game_players[n].state == "Perdiste" || data.game_players[n].state == "Empataste, Verguenza."){
+            if (data.game_players[n].state == "Ganaste" || data.game_players[n].state == "Perdiste" ||
+            data.game_players[n].state == "Empataste, Verguenza."){
                 window.location.assign("index.html")//SI EL JUEGO TERMINO, LO DEVUELVE A LA PANTALLA DE INICIO
             }
         }
@@ -453,19 +455,49 @@ function cargarTurno(data){
 function cargarBarcosQueHundimos(data){
     for (n = 0; n < data.game_players.length ; n++) { //este for consulta el nombre del jugador
         if (data.game_players[n].game_player_id == params.get("gp")) {
-        data.game_players[n].sinks.forEach(item => { //CARGA LOS BARCOS QUE NOSOTROS HUNDIMOS
-            if (item.ship_positions[0].slice(1) == item.ship_positions[1].slice(1)) {
-                createShips(item.ship_type, item.ship_positions.length,
-                    'vertical', document.getElementById('salvo' + item.ship_positions[0]), true)
-            } else {
-                if (item.ship_positions[0].length > 2) {
-                    createShips(item.ship_type, item.ship_positions.length,
-                        'horizontal', document.getElementById('salvo' + item.ship_positions[1]), true)
-                }
-                createShips(item.ship_type, item.ship_positions.length,
-                    'horizontal', document.getElementById('salvo' + item.ship_positions[0]), true)
-                }
+         if(filtrado.length == 0){
+            data.game_players[n].sinks.forEach(item => { //por cada barco hundido hace:
+                    if (item.ship_positions[0].slice(1) == item.ship_positions[1].slice(1)) {
+                        createShips(item.ship_type, item.ship_positions.length,
+                            'vertical', document.getElementById('salvo' + item.ship_positions[0]), true)
+                        shipsDestroyed.push("salvo"+item.ship_positions[0])
+                    } else {
+                        if (item.ship_positions[0].length > 2) {
+                            createShips(item.ship_type, item.ship_positions.length,
+                                'horizontal', document.getElementById('salvo' + item.ship_positions[1]), true)
+                            shipsDestroyed.push("salvo"+item.ship_positions[0])
+                        }
+                        createShips(item.ship_type, item.ship_positions.length,
+                            'horizontal', document.getElementById('salvo' + item.ship_positions[0]), true)
+                        shipsDestroyed.push("salvo"+item.ship_positions[0])
+                        }
             })
+        } else{ 
+        
+        
+            data.game_players[n].sinks.forEach(sink => {if (!shipsDestroyed.contains("salvo" + sink.ship_positions)){
+                filtrado.push(sink)
+            }})
+
+        filtrado.forEach(item => { //por cada barco hundido hace:
+                if ("salvo" + item.ship_positions[0] != destroyed) { //si es distinta posicion
+                    if (item.ship_positions[0].slice(1) == item.ship_positions[1].slice(1)) {
+                        createShips(item.ship_type, item.ship_positions.length,
+                            'vertical', document.getElementById('salvo' + item.ship_positions[0]), true)
+                        shipsDestroyed.push("salvo"+item.ship_positions[0])
+                    } else {
+                        if (item.ship_positions[0].length > 2) {
+                            createShips(item.ship_type, item.ship_positions.length,
+                                'horizontal', document.getElementById('salvo' + item.ship_positions[1]), true)
+                            shipsDestroyed.push("salvo"+item.ship_positions[0])
+                        }
+                        createShips(item.ship_type, item.ship_positions.length,
+                            'horizontal', document.getElementById('salvo' + item.ship_positions[0]), true)
+                        shipsDestroyed.push("salvo"+item.ship_positions[0])
+                        }
+                    }
+            })
+        }
         }
     }
 }

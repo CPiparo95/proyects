@@ -134,20 +134,24 @@ public class GamePlayer {
     }
 
     public String getState() {
-        if (this.getSinks(this).size() == 5 && this.getSinks(getOponentGP(this)).size() == 5){
+        if (this.getShip().size() == 0) {
+            return "creacion de barcos";
+        }else if (getOponentGP(this) == null){
+            return "Espera";
+        }else if (this.getSinks(this).size() == 5 && this.getSinks(getOponentGP(this)).size() == 5){
             return "Empataste, verguenza.";
         }else if (this.getSinks(this).size() == 5 && this.getSinks(getOponentGP(this)).size() != 5){
             return "Ganaste";
         }else if (this.getSinks(this).size() != 5 && this.getSinks(getOponentGP(this)).size() == 5) {
             return "Perdiste, Verguenza.";
-        }else if (this.getShip().size() == 0) {
-            return "creacion de barcos";
         }else if (this.getShip().size() == 5 && getOponentGP(this).getShip().size() == 0) {
             return "Espera";
         }else if (this.getSalvoes().size() > getOponentGP(this).getSalvoes().size()) {
             return "Espera";
         }else if (this.getHost() && this.getSalvoes().size() == getOponentGP(this).getSalvoes().size()){
             return "Envio de salvos";
+        }else if (!this.getHost() && this.getSalvoes().size() == getOponentGP(this).getSalvoes().size()){
+            return "Espera";
         }else{
             return "Envio de salvos";
         }
@@ -165,13 +169,18 @@ public class GamePlayer {
         GamePlayer gpEnemigo = getOponentGP(gpNuestro);
         Set<Salvoes> salvos = gpNuestro.getSalvoes();
 
-        List<String> allCells = new ArrayList<>();
-        for (Salvoes salvo: salvos) {
-            allCells.addAll(salvo.getHits());
-        }
-        for (Ship ship:gpEnemigo.getShip()) {
-            if (allCells.containsAll(ship.getLocations())){
-                sinks.add(ship);
+        if (gpEnemigo == null) {
+            return sinks;
+        }else {
+            List<String> allCells = new ArrayList<>();
+            for (Salvoes salvo : salvos) {
+                allCells.addAll(salvo.getHits());
+            }
+
+            for (Ship ship : gpEnemigo.getShip()) {
+                if (allCells.containsAll(ship.getLocations())) {
+                    sinks.add(ship);
+                }
             }
         }
         return sinks;
