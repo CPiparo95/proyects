@@ -94,7 +94,6 @@ public class AppController {
                 return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
             } else {
                 GamePlayer newgp = new GamePlayer(player, game, LocalDateTime.now(), false);
-                newgp.setState("creacion de barcos");
                 gamePlayerRepo.save(newgp);
                 dto.put("Success", "Te has unido al juego correctamente");
                 return new ResponseEntity<>(dto, HttpStatus.CREATED);
@@ -117,7 +116,7 @@ public class AppController {
         Game game = gameRepo.save(new Game(LocalDateTime.now()));
 
         GamePlayer gp = gamePlayerRepo.save(new GamePlayer(player, game, game.getCreationTime(),
-                true, "creacion de barcos"));
+                true));
         dto.put(" Success ", " El juego ha sido creado, y usted se ha unido a el");
         dto.put("gamePlayerID", gp.getId());
         return new ResponseEntity<>(dto, HttpStatus.CREATED);
@@ -168,8 +167,6 @@ public class AppController {
                     return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
                 } else {
                     ships.forEach(gp::addShip);
-
-                    gp.setState("Envio de salvos");
 
                     gamePlayerRepo.save(gp);
 
@@ -226,8 +223,6 @@ public class AppController {
             gp.addSalvoes(salvoes);//AGREGA LOS SALVOS A LA RELACION
             GamePlayer contraryGp = getOponentGP(gp);
 
-            gp.setState("Espera");
-            contraryGp.setState("Envio de salvos");
                 gamePlayerRepo.save(gp);
                 gamePlayerRepo.save(contraryGp);
             if (isEnd(gp,contraryGp)){
@@ -325,27 +320,15 @@ public class AppController {
             if (myGp.getSinks(myGp).size() == 5 && contraryGp.getSinks(contraryGp).size() != 5){
                 scoreRepo.save(new Score(myGp.getPlayer(),myGp.getGame(),LocalDateTime.now(), 1.0));
                 scoreRepo.save(new Score(contraryGp.getPlayer(),myGp.getGame(),LocalDateTime.now(), 0.0));
-                myGp.setState("Ganaste");
-                contraryGp.setState("Perdiste");
-                gamePlayerRepo.save(myGp);
-                gamePlayerRepo.save(contraryGp);
                 return true;
             }else if (myGp.getSinks(myGp).size() == 5 && contraryGp.getSinks(contraryGp).size() == 5){
                 scoreRepo.save(new Score(myGp.getPlayer(),myGp.getGame(),LocalDateTime.now(), 0.5));
                 scoreRepo.save(new Score(contraryGp.getPlayer(),myGp.getGame(),LocalDateTime.now(), 0.5));
-                myGp.setState("Empataste, verguenza.");
-                contraryGp.setState("Empataste, Verguenza.");
-                gamePlayerRepo.save(myGp);
-                gamePlayerRepo.save(contraryGp);
                 return true;
             }
             else if (myGp.getSinks(myGp).size() != 5 && contraryGp.getSinks(contraryGp).size() == 5){
                 scoreRepo.save(new Score(myGp.getPlayer(),myGp.getGame(),LocalDateTime.now(), 0.0));
                 scoreRepo.save(new Score(contraryGp.getPlayer(),myGp.getGame(),LocalDateTime.now(), 1.0));
-                myGp.setState("Perdiste");
-                contraryGp.setState("Ganaste");
-                gamePlayerRepo.save(myGp);
-                gamePlayerRepo.save(contraryGp);
                 return true;
 
             }else{

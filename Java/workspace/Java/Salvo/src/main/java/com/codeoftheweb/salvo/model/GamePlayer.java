@@ -33,8 +33,6 @@ public class GamePlayer {
 
     private LocalDateTime joinTime;
 
-    private String state;
-
     private Boolean host;
 
     public GamePlayer(){}
@@ -44,14 +42,6 @@ public class GamePlayer {
         this.player = player;
         this.game = game;
         this.joinTime = joinTime;
-    }
-
-    public GamePlayer(Player player, Game game, LocalDateTime joinTime, Boolean host, String state){
-        this.host = host;
-        this.player = player;
-        this.game = game;
-        this.joinTime = joinTime;
-        this.state = state;
     }
 
     public Map<String, Object> gameDTO(){
@@ -144,10 +134,6 @@ public class GamePlayer {
     }
 
     public String getState() {
-        return state;
-    }
-
-    public String getState() {
         if (this.getSinks(this).size() == 5 && this.getSinks(getOponentGP(this)).size() == 5){
             return "Empataste, verguenza.";
         }else if (this.getSinks(this).size() == 5 && this.getSinks(getOponentGP(this)).size() != 5){
@@ -158,13 +144,13 @@ public class GamePlayer {
             return "creacion de barcos";
         }else if (this.getShip().size() == 5 && getOponentGP(this).getShip().size() == 0) {
             return "Espera";
-        }else if (this.getShip().size() == 5 && getOponentGP(this).getShip().size() == 0) {
+        }else if (this.getSalvoes().size() > getOponentGP(this).getSalvoes().size()) {
             return "Espera";
+        }else if (this.getHost() && this.getSalvoes().size() == getOponentGP(this).getSalvoes().size()){
+            return "Envio de salvos";
+        }else{
+            return "Envio de salvos";
         }
-    }
-
-    public void setState(String state) {
-        this.state = state;
     }
 
     public GamePlayer getOponentGP (GamePlayer myGP){
@@ -174,7 +160,7 @@ public class GamePlayer {
 
     //AGREGA LOS SINKS A SALVO
     public Set<Ship> getSinks(GamePlayer gpNuestro){
-        Set <Ship> sinks = null;
+        Set <Ship> sinks = new HashSet<>();
 
         GamePlayer gpEnemigo = getOponentGP(gpNuestro);
         Set<Salvoes> salvos = gpNuestro.getSalvoes();
