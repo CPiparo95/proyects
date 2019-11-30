@@ -125,8 +125,6 @@ const app = new Vue({
                 }
             },
             props: ['games','userdata'],
-            //PREGUNTAR A RODRI COMO HACER CON V-ELSE PARA MOSTRAR LA INFO A PESAR DE HABER 1 SOLO GP
-            //ERROR CON app.user_information.player.user_name
             template: `
             {{app.compruebaUser}}
                         <div>
@@ -166,7 +164,7 @@ const app = new Vue({
                                                 </button>
                                             </td>
 
-                                            <td v-for="gp in game.game_players" v-show="gp.state != 'Ganaste' || gp.state != 'Perdiste' || gp.state != 'Empataste, Verguenza.' " >
+                                            <td v-for="gp in game.game_players" v-show="gp.state != 'Ganaste' && gp.state != 'Perdiste, Verguenza.' && gp.state != 'Empataste, Verguenza.' " >
                                                 <button type="button" class="btn btn-primary"
                                                 v-if="gp.player.user_name == userdata.player.user_name">
                                                     <a @click="goToGame(gp.game_player_id)"> Go to the game </a>

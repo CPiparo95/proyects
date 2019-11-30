@@ -8,22 +8,16 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.*;
 
 @RestController
 @RequestMapping("/api")
 public class AppController {
 
-    private GamePlayer gp;
-
-    private Ship ship;
-
     @Autowired
-    PasswordEncoder encoder;
+    private PasswordEncoder encoder;
 
     @Autowired
     private ShipRepository shipRepo;
@@ -139,7 +133,7 @@ public class AppController {
             if (gp == null) {
                 dto.put("Error", "This game does not exist!");
                 return new ResponseEntity<>(dto, HttpStatus.NOT_FOUND);
-            }else if (gp.getState().equals("Ganaste") || gp.getState().equals("Perdiste") ||
+            }else if (gp.getState().equals("Ganaste") || gp.getState().equals("Perdiste, verguenza.") ||
                     gp.getState().equals("Empataste, verguenza.")) { //STATE
                 dto.put("Error", "The game is finished, you cannot place ships in this game.");
                 return new ResponseEntity<>(dto, HttpStatus.UNAUTHORIZED);
@@ -195,7 +189,7 @@ public class AppController {
             if (gp == null) {
                 dto.put("Error", "This game does not exist!");
                 return new ResponseEntity<>(dto, HttpStatus.NOT_FOUND);
-            }else if (gp.getState().equals("Ganaste") || gp.getState().equals("Perdiste") || gp.getState().equals("Empataste, verguenza.")) { //STATE
+            }else if (gp.getState().equals("Ganaste") || gp.getState().equals("Perdiste, verguenza.") || gp.getState().equals("Empataste, verguenza.")) { //STATE
                 dto.put("Error", "The game is finished, you cannot send salvoes in this game.");
                 return new ResponseEntity<>(dto, HttpStatus.UNAUTHORIZED);
             }else if (gp.getPlayer().getId() != player.getId()) {
@@ -210,10 +204,10 @@ public class AppController {
             }else if (this.areOverlappedsalvos(gp.getSalvoes(), salvoes)) {
                 dto.put("Error", "No seas boludo, tenes salvos overlapeados");
                 return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
-            }else if (getOponentGP(gp) == null) {
+            }else if (gp.getOponentGP(gp) == null) {
                 dto.put("Error", "You cannot fire salvoes if you have no opponent! what you want to fire? water?");
                 return new ResponseEntity<>(dto, HttpStatus.I_AM_A_TEAPOT);
-            }else if (getOponentGP(gp).getShip().size() == 0) {
+            }else if (gp.getOponentGP(gp).getShip().size() == 0) {
                 dto.put("Error", "You cannot fire salvos if the opponent has not placed it's ships!");
                 return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
             }else if (!gp.getState().equals("Envio de salvos")){
@@ -221,7 +215,7 @@ public class AppController {
                 return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
             }else{
             gp.addSalvoes(salvoes);//AGREGA LOS SALVOS A LA RELACION
-            GamePlayer contraryGp = getOponentGP(gp);
+            GamePlayer contraryGp = gp.getOponentGP(gp);
 
                 gamePlayerRepo.save(gp);
                 gamePlayerRepo.save(contraryGp);
@@ -421,11 +415,6 @@ public class AppController {
             }
         }
         return false;
-    }
-
-    private GamePlayer getOponentGP (GamePlayer myGP){
-        return myGP.getGame().getGamePlayers().stream().filter
-                (gpa -> gpa.getId() != myGP.getId()).findFirst().orElse(null);
     }
 }
 

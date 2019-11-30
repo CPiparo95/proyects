@@ -204,11 +204,9 @@ const createShips = function (shipType, length, orientation, parent, isStatic) {
 
 let data = {}
 var params = new URLSearchParams(window.location.search)
-let salvoArray = []
 var ships = ['gaucho1', 'gaucho2', 'gaucho3', 'gaucho4', 'gaucho5'];
 var shipsLocated = []
 let shipsDestroyed = []
-let filtrado = []
 
 arranqueGrillas()
 
@@ -239,27 +237,6 @@ function getShips() {
     sendToBackend()
 }
 
-function getShipsDestroyed() {
-    console.log("entro a getShips")
-    for (let i = 0; i < ships.length; i++) {
-        let shipObject = {
-            type: "",
-            locations: []
-        }
-        let ship = document.getElementById(ships[i]);
-        if (ship.dataset.y != undefined && ship.dataset.x != undefined) {
-            shipObject.type = ship.id;
-
-            let config = document.getElementsByClassName(`${ships[i]}-busy-cell`);
-            for (let i = 0; i < config.length; i++) {
-                shipObject.locations.push(config[i].dataset.y + config[i].dataset.x);
-            }
-            shipsLocated.push(shipObject);
-        }
-    }
-
-}
-
 function sendToBackend() {
     if (shipsLocated.length == 5) {
         fetch("/api/placeShips/" + params.get("gp"), {
@@ -287,13 +264,16 @@ window.addEventListener("load", function () {
         element.addEventListener("click", function (evt) {
             let clicked = evt.currentTarget;
             let location = clicked.dataset.y + clicked.dataset.x;
-            if (app.salvoesPositionsFire.includes(location) || (app.salvoesPositionsNotFire.includes(location))) {
+            if (app.salvoesPositionsFire.includes(location)) { //SI INTENTA DISPARAR SOBRE UNA POSICION DONDE DISPARO CON ANTERIORIDAD
                 alert("La posicion ya fue ingresada");
-            } else if (app.salvoesPositionsNotFire.length == 5) {
-                alert("ya disparaste todos tus tiros, si quieres cambiar las posiciones recarga la pagina.");
-            } else if (app.shipsPositioned == false) {
+            }else if ((app.salvoesPositionsNotFire.includes(location))){ //SI INTENTA VOLVER A DISPARAR SOBRE LA MISMA POSICION, LA MISMA DESAPARECE
+                document.getElementById("salvo" + location).style.backgroundColor = "white"
+                app.salvoesPositionsNotFire = removeItemFromArr(app.salvoesPositionsNotFire, location)
+            }else if (app.salvoesPositionsNotFire.length == 5) { //SI INTENTA DISPARAR MAS DE 5 TIROS
+                alert("ya posicionaste todos tus tiros.");
+            } else if (app.shipsPositioned == false) { //NO ESTA EN FASE DE DISPAROS, si shipsPositioned == true entonces si es la fase.
                 alert("Todabia no es fase de disparos.");
-            } else {
+            }else {
                 document.getElementById("salvo" + location).style.backgroundColor = "red"
                 app.salvoesPositionsNotFire.push(location);
             }
@@ -365,16 +345,16 @@ function arranqueGrillas(){
         data = json.data
 
         cargaFinJuegoyDeclaraEstado(data)
-        
+
         cargarTurno(data)
-
-        cargarBarcosQueHundimos(data)
-
-        salvosDisparadosyHits(data)
 
         cargarBarcos(data)
 
         salvosQueNosTiraron(data)
+
+        salvosDisparadosyHits(data)
+
+        cargarBarcosQueHundimos(data)
 
     })
     .catch(function (error) {
@@ -455,49 +435,26 @@ function cargarTurno(data){
 function cargarBarcosQueHundimos(data){
     for (n = 0; n < data.game_players.length ; n++) { //este for consulta el nombre del jugador
         if (data.game_players[n].game_player_id == params.get("gp")) {
-         if(filtrado.length == 0){
-            data.game_players[n].sinks.forEach(item => { //por cada barco hundido hace:
-                    if (item.ship_positions[0].slice(1) == item.ship_positions[1].slice(1)) {
-                        createShips(item.ship_type, item.ship_positions.length,
-                            'vertical', document.getElementById('salvo' + item.ship_positions[0]), true)
-                        shipsDestroyed.push("salvo"+item.ship_positions[0])
-                    } else {
-                        if (item.ship_positions[0].length > 2) {
-                            createShips(item.ship_type, item.ship_positions.length,
-                                'horizontal', document.getElementById('salvo' + item.ship_positions[1]), true)
-                            shipsDestroyed.push("salvo"+item.ship_positions[0])
-                        }
-                        createShips(item.ship_type, item.ship_positions.length,
-                            'horizontal', document.getElementById('salvo' + item.ship_positions[0]), true)
-                        shipsDestroyed.push("salvo"+item.ship_positions[0])
-                        }
-            })
-        } else{ 
-        
-        
-            data.game_players[n].sinks.forEach(sink => {if (!shipsDestroyed.contains("salvo" + sink.ship_positions)){
-                filtrado.push(sink)
-            }})
 
-        filtrado.forEach(item => { //por cada barco hundido hace:
-                if ("salvo" + item.ship_positions[0] != destroyed) { //si es distinta posicion
+            data.game_players[n].sinks.forEach(item => { //por cada barco hundido hace:
+
+                if (!shipsDestroyed.includes(item.ship_positions[0])) {
                     if (item.ship_positions[0].slice(1) == item.ship_positions[1].slice(1)) {
                         createShips(item.ship_type, item.ship_positions.length,
                             'vertical', document.getElementById('salvo' + item.ship_positions[0]), true)
-                        shipsDestroyed.push("salvo"+item.ship_positions[0])
+                            item.ship_positions.forEach(position => shipsDestroyed.push(position))
                     } else {
                         if (item.ship_positions[0].length > 2) {
                             createShips(item.ship_type, item.ship_positions.length,
                                 'horizontal', document.getElementById('salvo' + item.ship_positions[1]), true)
-                            shipsDestroyed.push("salvo"+item.ship_positions[0])
+                                item.ship_positions.forEach(position => shipsDestroyed.push(position))
                         }
                         createShips(item.ship_type, item.ship_positions.length,
                             'horizontal', document.getElementById('salvo' + item.ship_positions[0]), true)
-                        shipsDestroyed.push("salvo"+item.ship_positions[0])
+                            item.ship_positions.forEach(position => shipsDestroyed.push(position))
                         }
                     }
             })
-        }
         }
     }
 }
@@ -557,4 +514,13 @@ function salvosDisparadosyHits(data){
             }
         }
     }
+}
+
+function removeItemFromArr ( arr, item ) {
+    var i = arr.indexOf( item );
+ 
+    if ( i !== -1 ) {
+        arr.splice( i, 1 );
+    }
+  return arr
 }
