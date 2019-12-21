@@ -1,9 +1,0 @@
-package com.codeoftheweb.salvo.repositorys;
-
-import com.codeoftheweb.salvo.model.Salvoes;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-
-@RepositoryRestResource
-public interface SalvoesRepository extends JpaRepository<Salvoes, Long> {
-}
