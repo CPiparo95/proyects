@@ -129,7 +129,7 @@ const app = new Vue({
             {{app.compruebaUser}}
                         <div>
                             <div class="text-center">
-                                <img id="imagenFondo" src="images/playstation.jpg" class="rounded">
+                                <img id="imagenFondo" src="images/principal.jpg" class="rounded">
                                 <div>
                                     <nav style="border: 2px solid black; position: relative; z-index: 10; ">
                                         <ul style="list-style-type: none; display: flex; justify-content: space-around;">
@@ -217,7 +217,7 @@ const app = new Vue({
             template: `
                         <div>
                             <div class="text-center">
-                                <img id="imagenFondo" src="images/playstation.jpg" class="rounded">
+                                <img id="imagenFondo" src="images/principal.jpg" class="rounded">
 
                                 <table class="table">
                                     <thead class="thead-dark">
@@ -259,7 +259,7 @@ const app = new Vue({
                     let form = ev.target
                     let result = true
                     if (form.username.value == "" || form.password.value == "") {
-                        alert("flaco, llename TODOS los campos")
+                        alert("Es necesario que todos los campos esten completos")
                         return false
                     }else{
                         //fetch a LOGIN
@@ -288,7 +288,7 @@ const app = new Vue({
                 registration: function(ev){
                     let form = ev.target
                     if (form.username.value == "" || form.password.value == "" || form.email.value == "") {
-                        alert("flaco, llename TODOS los campos")
+                        alert("Es necesario que todos los campos esten completos")
                         return false
                     }else{
                         //fetch a LOGIN
@@ -306,6 +306,7 @@ const app = new Vue({
                             }else if(response.status==201) { //SUCCESS, Registrado
                                 this.login= true
                                 this.register= false
+                                this.log(ev)
                                 return response.json()
                             }
                         })
@@ -323,8 +324,8 @@ const app = new Vue({
                         <div>
                             <div class="sidenav">
                                 <div class="login-main-text">
-                                    <h2>Application<br> Login Page</h2>
-                                    <p>Login or register from here to access.</p>
+                                    <h2>Gaucho Battle<br> Login Page</h2>
+                                    <p>Login // register from here to access.</p>
                                 </div>
                             </div>
 

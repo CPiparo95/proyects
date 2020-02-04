@@ -234,7 +234,12 @@ function getShips() {
             shipsLocated.push(shipObject);
         }
     }
-    sendToBackend()
+    if(shipsLocated.length <= 4){
+        alert("Colocaste " + shipsLocated.length + " gauchos, necesitas colocar 5 gauchos")
+        shipsLocated = []
+    }else{
+        sendToBackend()
+    }
 }
 
 function sendToBackend() {
@@ -304,7 +309,7 @@ function sendSalvoes() {
             })
             .catch(ex => console.log(ex));
     } else {
-        alert("se va a caer, digo, tenes que mandar 5 salvos, ni mas ni menos")
+        alert("tus gauchos solo pueden disparar 5 veces")
     }
 }
 

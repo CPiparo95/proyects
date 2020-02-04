@@ -46,17 +46,17 @@ public class AppController {
         Map<String, Object> map = new HashMap<>();
 
         if (email.isEmpty() || password.isEmpty()) {
-            map.put("error", "no ves que hay campos vacios flaco?");
+            map.put("error", "existen campos vacios");
             return new ResponseEntity<>(map, HttpStatus.FORBIDDEN);
         }
 
         if (playerRepo.findByUsername(username) != null) {
-            map.put("error", "el usuario que elegiste ya existe, probaste apagando y volviendo a encender?");
+            map.put("error", "el usuario que elegiste ya existe");
             return new ResponseEntity<>(map, HttpStatus.FORBIDDEN);
         }
 
         playerRepo.save(new Player(username, encoder.encode(password), email));
-        map.put("Success!", "has creado al usuario, pero aun no esta logueado");
+        map.put("Success!", "has creado al usuario y ya esta autenticado");
         return new ResponseEntity<>(map, HttpStatus.CREATED);
 
     }
@@ -111,7 +111,7 @@ public class AppController {
 
         GamePlayer gp = gamePlayerRepo.save(new GamePlayer(player, game, game.getCreationTime(),
                 true));
-        dto.put(" Success ", " El juego ha sido creado, y usted se ha unido a el");
+        dto.put("exito!", "El juego ha sido creado, y usted se ha unido a el");
         dto.put("gamePlayerID", gp.getId());
         return new ResponseEntity<>(dto, HttpStatus.CREATED);
     }
@@ -125,7 +125,7 @@ public class AppController {
         Map<String, Object> dto = new HashMap<>();
 
         if (isGuest(authentication)) {
-            dto.put("Error", "Guest's cannot play games or place ships");
+            dto.put("Error", "Guest's cannot play games or place gauchos");
             return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
         } else {
             GamePlayer gp = gamePlayerRepo.findById(gpId).orElse(null);
@@ -135,36 +135,36 @@ public class AppController {
                 return new ResponseEntity<>(dto, HttpStatus.NOT_FOUND);
             }else if (gp.getState().equals("Ganaste") || gp.getState().equals("Perdiste, verguenza.") ||
                     gp.getState().equals("Empataste, verguenza.")) { //STATE
-                dto.put("Error", "The game is finished, you cannot place ships in this game.");
+                dto.put("Error", "The game is finished, you cannot place gauchos in this game.");
                 return new ResponseEntity<>(dto, HttpStatus.UNAUTHORIZED);
             }else if (!gp.getState().equals("creacion de barcos")) {
-                dto.put("Error", "you cannot create ships!");
+                dto.put("Error", "you cannot create gauchos!");
                 return new ResponseEntity<>(dto, HttpStatus.UNAUTHORIZED);
             }else if (gp.getPlayer().getId() != player.getId()) {
                 dto.put("Error", "You are not playing this game!");
                 return new ResponseEntity<>(dto, HttpStatus.UNAUTHORIZED);
             } else if (gp.getShip().size() > 0) {
-                dto.put("Error", "there are already ships positioned");
+                dto.put("Error", "there are already gauchos positioned");
                 return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
             } else if (ships == null || ships.size() != 5) {
-                dto.put("Error", "There is not enough ships or you placed yoo much ships! (You have to add 5 ships)");
+                dto.put("Error", "There is not enough gauchos or you placed too much gauchos! (You have to add 5 gauchos)");
                 return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
             } else {
                 if (ships.stream().anyMatch(this::isOutOfRange)) {
-                    dto.put("Error", "You have ships out of range");
+                    dto.put("Error", "You have gauchos out of range");
                     return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
                 } else if (ships.stream().anyMatch(this::isNotConsecutive)) {
-                    dto.put("Error", "Your ships are not consecutive!");
+                    dto.put("Error", "Your gauchos are not consecutive!");
                     return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
                 } else if (this.areOverlapped(ships)) {
-                    dto.put("Error", "Your ships are overlapped!");
+                    dto.put("Error", "Your gauchos are overlapped!");
                     return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
                 } else {
                     ships.forEach(gp::addShip);
 
                     gamePlayerRepo.save(gp);
 
-                    dto.put("Success", "Ships have been added");
+                    dto.put("Success", "gauchos have been added");
                     return new ResponseEntity<>(dto, HttpStatus.CREATED);
                 }
             }
@@ -178,7 +178,7 @@ public class AppController {
                                                           @RequestBody Salvoes salvoes) {
         Map<String, Object> dto = new HashMap<>();
         if (isGuest(authentication)) {
-            dto.put("Error", "Guest's cannot play games or fire salvoes");
+            dto.put("Error", "Guest's cannot play games or fire tiros");
             return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
         } else {
             GamePlayer gp = gamePlayerRepo.findById(gpId).orElse(null);
@@ -190,28 +190,28 @@ public class AppController {
                 dto.put("Error", "This game does not exist!");
                 return new ResponseEntity<>(dto, HttpStatus.NOT_FOUND);
             }else if (gp.getState().equals("Ganaste") || gp.getState().equals("Perdiste, verguenza.") || gp.getState().equals("Empataste, verguenza.")) { //STATE
-                dto.put("Error", "The game is finished, you cannot send salvoes in this game.");
+                dto.put("Error", "The game is finished, you cannot send tiros in this game.");
                 return new ResponseEntity<>(dto, HttpStatus.UNAUTHORIZED);
             }else if (gp.getPlayer().getId() != player.getId()) {
                 dto.put("Error", "You are not playing this game!");
                 return new ResponseEntity<>(dto, HttpStatus.UNAUTHORIZED);
             } else if (gp.getSalvoes().stream().anyMatch(salvo -> salvo.getTurn() == salvoes.getTurn())) {
-                dto.put("Error", "the salvoes have been already fired!");
+                dto.put("Error", "the tiros have been already fired!");
                 return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
             } else if (salvoes == null || salvoes.getLocations().size() != 5) {
-                dto.put("Error", "There is not enough salvoes fired or you have fired more than 5 salvoes");
+                dto.put("Error", "There is not enough tiros fired or you have fired more than 5 tiros");
                 return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
             }else if (this.areOverlappedsalvos(gp.getSalvoes(), salvoes)) {
-                dto.put("Error", "No seas boludo, tenes salvos overlapeados");
+                dto.put("Error", "there are overlapped tiros");
                 return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
             }else if (gp.getOponentGP(gp) == null) {
-                dto.put("Error", "You cannot fire salvoes if you have no opponent! what you want to fire? water?");
+                dto.put("Error", "You cannot fire tiros if you have no opponent! what you want to fire? water?");
                 return new ResponseEntity<>(dto, HttpStatus.I_AM_A_TEAPOT);
             }else if (gp.getOponentGP(gp).getShip().size() == 0) {
-                dto.put("Error", "You cannot fire salvos if the opponent has not placed it's ships!");
+                dto.put("Error", "You cannot fire tiros if the opponent has not placed it's gauchos!");
                 return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
             }else if (!gp.getState().equals("Envio de salvos")){
-                dto.put("Error", "you have to wait to you opponent to fire salvos!");
+                dto.put("Error", "you have to wait to your opponent to fire tiros!");
                 return new ResponseEntity<>(dto, HttpStatus.FORBIDDEN);
             }else{
             gp.addSalvoes(salvoes);//AGREGA LOS SALVOS A LA RELACION
@@ -223,7 +223,7 @@ public class AppController {
                 dto.put("End", "The game is finished!" + gp.getState());
                 return new ResponseEntity<>(dto, HttpStatus.I_AM_A_TEAPOT);
             }else {
-                dto.put("Success", "Salvoes have been fired!");
+                dto.put("Success", "Tiros have been fired!");
                 return new ResponseEntity<>(dto, HttpStatus.CREATED);
             }
         }

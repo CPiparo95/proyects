@@ -98,9 +98,11 @@ const app = new Vue({
                             return res.json()
                         })
                     .then(json =>{
-                        alert(JSON.stringify(json))
-                        //window.location.reload(true);
-                        this.goToGame(json.gamePlayerID)
+                        if (json.status==403) {
+                            alert("Error en las credenciales. No es posible crear juegos para usuarios guest")
+                        }else{
+                            this.goToGame(json.gamePlayerID)
+                        }
                     })
                     
                 },
@@ -129,7 +131,7 @@ const app = new Vue({
             {{app.compruebaUser}}
                         <div>
                             <div class="text-center">
-                                <img id="imagenFondo" src="images/playstation.jpg" class="rounded">
+                                <img id="imagenFondo" src="images/principal.jpg" class="rounded">
                                 <div>
                                     <nav style="border: 2px solid black; position: relative; z-index: 10; ">
                                         <ul style="list-style-type: none; display: flex; justify-content: space-around;">
@@ -217,7 +219,7 @@ const app = new Vue({
             template: `
                         <div>
                             <div class="text-center">
-                                <img id="imagenFondo" src="images/playstation.jpg" class="rounded">
+                                <img id="imagenFondo" src="images/principal.jpg" class="rounded">
 
                                 <table class="table">
                                     <thead class="thead-dark">
@@ -259,7 +261,7 @@ const app = new Vue({
                     let form = ev.target
                     let result = true
                     if (form.username.value == "" || form.password.value == "") {
-                        alert("flaco, llename TODOS los campos")
+                        alert("Es necesario que todos los campos esten completos")
                         return false
                     }else{
                         //fetch a LOGIN
@@ -288,10 +290,10 @@ const app = new Vue({
                 registration: function(ev){
                     let form = ev.target
                     if (form.username.value == "" || form.password.value == "" || form.email.value == "") {
-                        alert("flaco, llename TODOS los campos")
+                        alert("Es necesario que todos los campos esten completos")
                         return false
                     }else{
-                        //fetch a LOGIN
+                        //fetch a PLAYERS
                         let formdata = new FormData();
                         formdata.append("username", form.username.value)
                         formdata.append("password", form.password.value)
@@ -304,13 +306,26 @@ const app = new Vue({
                             if (response.status==403) { //ERROR, FORBIDDEN
                                 return response.json()
                             }else if(response.status==201) { //SUCCESS, Registrado
-                                this.login= true
-                                this.register= false
-                                return response.json()
+                                //loguea al user creado
+                                fetch("/api/login",{
+                                    method: "Post",
+                                    body: formdata
+                                })
+                                .then(response =>{
+                                    //NO RESOLVER LA RESPUESTA, LOGUEO MANEJADO POR SPRING, NO ES POSIBLE MANEJAR EL JSON
+                                    if(response.status==200) {
+                                        alert("Se a registrado exitosamente, el usuario es: " + form.username.value )
+                                        this.login= false
+                                        app.user_active = true
+                                    }
+                                })
+                                .catch(function (error) {
+                                    console.log(error)
+                                })
+
+                                app.actual_page = "game_list_page"
+                                return ""
                             }
-                        })
-                        .then(json =>{
-                            alert(JSON.stringify(json))
                         })
                         .catch(function (error) {
                             console.log(error)
@@ -323,8 +338,8 @@ const app = new Vue({
                         <div>
                             <div class="sidenav">
                                 <div class="login-main-text">
-                                    <h2>Application<br> Login Page</h2>
-                                    <p>Login or register from here to access.</p>
+                                    <h2>Gaucho Battle<br> Login Page</h2>
+                                    <p>Login // register from here to access.</p>
                                 </div>
                             </div>
 
