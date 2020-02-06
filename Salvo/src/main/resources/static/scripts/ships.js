@@ -309,7 +309,7 @@ function sendSalvoes() {
             })
             .catch(ex => console.log(ex));
     } else {
-        alert("tus gauchos solo pueden disparar 5 veces")
+        alert("has tirado " + app.salvoesPositionsNotFire.length + " tienes que disparar a 5 posiciones.")
     }
 }
 
